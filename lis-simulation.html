@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LIS Simulation — Saint Jason Memorial Hospital</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 /* ── BRAND TOKENS ─────────────────────────────────────────────────────── */
 :root {
@@ -138,7 +138,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 
 /* ── CASE SCREEN ───────────────────────────────────────────────────────── */
 #screen-case { background: var(--bg); }
-.case-body { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 14px; overflow: auto; align-items: start; }
+.case-body { flex: 1; display: grid; grid-template-columns: 1fr 300px; gap: 14px; padding: 14px; overflow: auto; align-items: start; max-width: 900px; width: 100%; margin-left: auto; margin-right: auto; }
 .case-requisition-col { display: flex; flex-direction: column; gap: 14px; }
 .case-right-col { display: flex; flex-direction: column; gap: 14px; }
 
@@ -148,24 +148,24 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 .panel-header-tag { background: rgba(255,255,255,0.12); padding: 2px 7px; border-radius: 10px; font-size: 10px; }
 
 /* ── REQUISITION ───────────────────────────────────────────────────────── */
-.req-form { background: var(--paper); padding: 18px 22px 14px; font-size: 13px; }
-.req-form-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--text-primary); padding-bottom: 10px; margin-bottom: 14px; }
-.req-lab-name { font-weight: 700; font-size: 14px; }
-.req-lab-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
-.req-form-title { font-size: 13px; font-weight: 700; text-align: right; }
-.req-ref { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 3px; }
-.req-section { margin-bottom: 12px; }
-.req-section-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); border-bottom: 1px solid var(--form-line); padding-bottom: 3px; margin-bottom: 8px; }
-.req-grid { display: grid; gap: 6px; }
+.req-form { background: var(--paper); font-size: 12px; border: 1px solid #b5bcc8; box-shadow: 1px 2px 5px rgba(0,0,0,0.07); }
+.req-form-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--text-primary); padding: 10px 14px 8px; background: #f3f4f7; }
+.req-lab-name { font-weight: 700; font-size: 13px; }
+.req-lab-sub { font-size: 10px; color: var(--text-secondary); margin-top: 2px; }
+.req-form-title { font-size: 12px; font-weight: 700; text-align: right; }
+.req-ref { font-family: var(--mono); font-size: 9px; color: var(--text-muted); text-align: right; margin-top: 3px; }
+.req-section { padding: 5px 14px 7px; border-bottom: 1px solid var(--form-line); }
+.req-section-title { font-size: 8px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); background: rgba(0,0,0,0.035); border-bottom: 1px solid var(--form-line); margin: -5px -14px 5px; padding: 3px 14px; }
+.req-grid { display: grid; gap: 3px 10px; }
 .req-grid-2 { grid-template-columns: 1fr 1fr; }
 .req-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 .req-field { display: flex; flex-direction: column; gap: 1px; }
-.req-field-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
-.req-field-line { border-bottom: 1px solid var(--form-line); min-height: 24px; display: flex; align-items: flex-end; padding-bottom: 2px; }
-.req-field-value { font-family: var(--hand); font-size: 18px; color: var(--ink); line-height: 1; padding-bottom: 1px; }
-.req-test-written { font-family: var(--hand); font-size: 17px; color: var(--ink); }
-.req-notes-line { font-family: var(--hand); font-size: 17px; color: var(--ink); border-bottom: 1px solid var(--form-line); min-height: 28px; display: flex; align-items: flex-end; padding-bottom: 2px; }
-.req-footer { border-top: 1px solid var(--form-line); margin-top: 10px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+.req-field-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+.req-field-line { border-bottom: 1px solid var(--form-line); min-height: 20px; display: flex; align-items: flex-end; padding-bottom: 1px; }
+.req-field-value { font-family: var(--hand); font-size: 16px; color: var(--ink); line-height: 1; padding-bottom: 1px; }
+.req-test-written { font-family: var(--hand); font-size: 15px; color: var(--ink); }
+.req-notes-line { font-family: var(--hand); font-size: 15px; color: var(--ink); border-bottom: 1px solid var(--form-line); min-height: 24px; display: flex; align-items: flex-end; padding-bottom: 1px; }
+.req-footer { padding: 5px 14px; display: flex; justify-content: space-between; font-size: 9px; color: var(--text-muted); background: #f3f4f7; }
 
 /* ── LABEL ─────────────────────────────────────────────────────────────── */
 .label-area { padding: 14px; display: flex; justify-content: center; }
@@ -641,6 +641,8 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 <script>
 'use strict';
 
+const HAND_FONTS = ["'Caveat', cursive", "'Kalam', cursive", "'Patrick Hand', cursive", "'Indie Flower', cursive"];
+
 /* ── CONSTANTS ───────────────────────────────────────────────────────── */
 const INSTR_PASSWORD = 'CNC-2026'; // Change this in settings below
 
@@ -1037,6 +1039,7 @@ function startSession() {
 /* ── RENDER CASE ─────────────────────────────────────────────────────── */
 function renderCase() {
   const c = state.cases[state.currentIndex];
+  if (!c.handFont) c.handFont = HAND_FONTS[Math.floor(Math.random() * HAND_FONTS.length)];
   const total = state.cases.length;
   const idx = state.currentIndex;
 
@@ -1055,8 +1058,12 @@ function renderCase() {
   document.getElementById('plating-step').style.display = 'none';
   document.getElementById('decision-panel-header').textContent = 'Accessioning Decision';
 
-  document.getElementById('req-form-content').innerHTML = renderReqForm(c);
-  document.getElementById('label-area').innerHTML        = renderLabel(c);
+  const reqEl = document.getElementById('req-form-content');
+  reqEl.style.setProperty('--hand', c.handFont);
+  reqEl.innerHTML = renderReqForm(c);
+  const labelEl = document.getElementById('label-area');
+  labelEl.style.setProperty('--hand', c.handFont);
+  labelEl.innerHTML = renderLabel(c);
   document.getElementById('specimen-details').innerHTML  = renderSpecimenDetails(c);
 }
 
@@ -1082,25 +1089,26 @@ function renderReqForm(c) {
     </div>
     <div class="req-section">
       <div class="req-section-title">Patient Information</div>
-      <div class="req-grid req-grid-2" style="margin-bottom:6px">
-        <div class="req-field"><div class="req-field-label">Patient Full Name</div><div class="req-field-line">${hw(R.name)}</div></div>
-        <div class="req-field"><div class="req-field-label">Date of Birth (YYYY-MM-DD)</div><div class="req-field-line">${hw(R.dob)}</div></div>
+      <div class="req-field" style="margin-bottom:4px">
+        <div class="req-field-label">Patient Full Name</div>
+        <div class="req-field-line">${hw(R.name)}</div>
       </div>
-      <div class="req-grid req-grid-2">
-        <div class="req-field"><div class="req-field-label">PHN (Personal Health Number)</div><div class="req-field-line">${hw(R.phn)}</div></div>
+      <div class="req-grid req-grid-3">
+        <div class="req-field"><div class="req-field-label">Date of Birth</div><div class="req-field-line">${hw(R.dob)}</div></div>
+        <div class="req-field"><div class="req-field-label">PHN</div><div class="req-field-line">${hw(R.phn)}</div></div>
         <div class="req-field"><div class="req-field-label">Ordering Physician</div><div class="req-field-line">${hw(R.provider)}</div></div>
       </div>
     </div>
     <div class="req-section">
-      <div class="req-section-title">Specimen Information</div>
+      <div class="req-section-title">Specimen</div>
       <div class="req-grid req-grid-3">
-        <div class="req-field"><div class="req-field-label">Source of Specimen</div><div class="req-field-line">${hw(R.source)}</div></div>
-        <div class="req-field"><div class="req-field-label">Date of Collection</div><div class="req-field-line">${hw(R.date)}</div></div>
         <div class="req-field"><div class="req-field-label">Specimen Type</div><div class="req-field-line">${hw(c.spec.type)}</div></div>
+        <div class="req-field"><div class="req-field-label">Source / Site</div><div class="req-field-line">${hw(R.source)}</div></div>
+        <div class="req-field"><div class="req-field-label">Collection Date</div><div class="req-field-line">${hw(R.date)}</div></div>
       </div>
     </div>
     <div class="req-section">
-      <div class="req-section-title">Tests Requested</div>
+      <div class="req-section-title">Tests / Clinical Notes</div>
       <div class="req-notes-line">${R.tests ? `<span class="req-test-written" style="${rot()}">${R.tests}</span>` : ''}</div>
     </div>
     <div class="req-footer"><span>Form MBR-2 Rev.3</span><span>Saint Jason Memorial Hospital · Laboratory Medicine</span></div>

@@ -663,15 +663,15 @@ const PHYSICIANS = ['Dr. Sarah Patel','Dr. Michael Chen','Dr. James Anderson','D
   'Dr. Robert Thompson','Dr. Lisa Johnson','Dr. David Kim','Dr. Emily Rodriguez','Dr. Kevin Singh'];
 
 const SPEC_DEFAULTS = {
-  'Urine':               { source: 'Voided Urine — Clean Catch Midstream', test: 'Urine C&S', container: 'Sterile urine container (white lid)', transport: 'Refrigerated (2–8°C)' },
-  'Blood Culture':       { source: 'Peripheral Blood — Right Antecubital', test: 'Blood Culture × 2 sets', container: 'Blood culture bottles (aerobic + anaerobic)', transport: 'Room temperature (20–25°C)' },
-  'Wound Swab':          { source: 'Wound — Left Lower Extremity', test: 'Wound C&S', container: 'ESwab (liquid Amies transport medium)', transport: 'Room temperature (20–25°C)' },
-  'Sputum':              { source: 'Sputum — Expectorated', test: 'Sputum C&S', container: 'Sterile sputum cup (wide-mouth)', transport: 'Refrigerated (2–8°C)' },
-  'Stool':               { source: 'Stool — Random', test: 'Stool Culture', container: 'Cary-Blair transport medium', transport: 'Refrigerated (2–8°C)' },
-  'Throat Swab':         { source: 'Throat — Posterior Pharynx', test: 'Group A Streptococcus Screen', container: 'ESwab (Amies transport medium)', transport: 'Refrigerated (2–8°C)' },
-  'Nasopharyngeal Swab': { source: 'Nasopharynx', test: 'Respiratory Viral Panel (PCR)', container: 'Viral Transport Medium (VTM)', transport: 'Refrigerated (2–8°C)' },
-  'CSF':                 { source: 'CSF — Lumbar Puncture (Tube 2)', test: 'CSF Gram Stain + Culture', container: 'Sterile numbered CSF tube', transport: 'Room temperature — STAT' },
-  'Tissue':              { source: 'Wound Tissue — Debridement', test: 'Tissue Culture', container: 'Sterile container with sterile saline', transport: 'Room temperature (20–25°C)' },
+  'Urine':               { source: 'Voided Urine — Clean Catch Midstream', test: 'Urine C&S', container: 'Sterile urine container (white lid)', transport: 'Refrigerated (2–8°C)', maxHours: 24 },
+  'Blood Culture':       { source: 'Peripheral Blood — Right Antecubital', test: 'Blood Culture × 2 sets', container: 'Blood culture bottles (aerobic + anaerobic)', transport: 'Room temperature (20–25°C)', maxHours: 2 },
+  'Wound Swab':          { source: 'Wound — Left Lower Extremity', test: 'Wound C&S', container: 'ESwab (liquid Amies transport medium)', transport: 'Room temperature (20–25°C)', maxHours: 24 },
+  'Sputum':              { source: 'Sputum — Expectorated', test: 'Sputum C&S', container: 'Sterile sputum cup (wide-mouth)', transport: 'Refrigerated (2–8°C)', maxHours: 24 },
+  'Stool':               { source: 'Stool — Random', test: 'Stool Culture', container: 'Cary-Blair transport medium', transport: 'Refrigerated (2–8°C)', maxHours: 48 },
+  'Throat Swab':         { source: 'Throat — Posterior Pharynx', test: 'Group A Streptococcus Screen', container: 'ESwab (Amies transport medium)', transport: 'Refrigerated (2–8°C)', maxHours: 24 },
+  'Nasopharyngeal Swab': { source: 'Nasopharynx', test: 'Respiratory Viral Panel (PCR)', container: 'Viral Transport Medium (VTM)', transport: 'Refrigerated (2–8°C)', maxHours: 48 },
+  'CSF':                 { source: 'CSF — Lumbar Puncture (Tube 2)', test: 'CSF Gram Stain + Culture', container: 'Sterile numbered CSF tube', transport: 'Room temperature — STAT', maxHours: 1 },
+  'Tissue':              { source: 'Wound Tissue — Debridement', test: 'Tissue Culture', container: 'Sterile container with sterile saline', transport: 'Room temperature (20–25°C)', maxHours: 24 },
 };
 
 const ERROR_META = {
@@ -1159,6 +1159,8 @@ function renderSpecimenDetails(c) {
   const reqContainer = c.specRequiredContainer || defaults.container || '—';
   const reqTransport  = defaults.transport || '—';
   const standardQty   = c.specStandardQty || '';
+  const maxHours      = defaults.maxHours || '—';
+  const collectedStr  = [c.label.date, c.label.time].filter(Boolean).join(' ') || '—';
 
   const ageNote = c.errors.includes('specimen_stability_age')
     ? `<div class="obs-note-row">⚠ Specimen age — collection date on label is outside the acceptable stability window for this specimen type</div>`
@@ -1189,6 +1191,11 @@ function renderSpecimenDetails(c) {
           <td class="obs-td-field">Qty / Appear.</td>
           <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${c.qty}</td>
           <td class="obs-td-required">${standardQty}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Stability</td>
+          <td class="obs-td-received">Collected: ${collectedStr}</td>
+          <td class="obs-td-required">Max ${maxHours} h from collection</td>
         </tr>
       </tbody>
     </table>

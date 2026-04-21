@@ -1824,6 +1824,8 @@ function renderSpecimenDetails(c) {
   const reqContainer = c.specRequiredContainer || c.spec.validContainers[0];
   const reqTransport  = c.spec.validTransport[0];
   const standardQty   = c.specStandardQty || c.spec.notes || '';
+  const maxHours      = c.spec.maxHours || '—';
+  const collectedStr  = [c.label.date, c.label.time].filter(Boolean).join(' ') || '—';
 
   const leakNote = c.specNotes
     ? `<div class="obs-note-row">⚠ ${c.specNotes}</div>`
@@ -1851,6 +1853,11 @@ function renderSpecimenDetails(c) {
           <td class="obs-td-field">Qty / Appear.</td>
           <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${c.qty}</td>
           <td class="obs-td-required">${standardQty}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Stability</td>
+          <td class="obs-td-received">Collected: ${collectedStr}</td>
+          <td class="obs-td-required">Max ${maxHours} h from collection</td>
         </tr>
       </tbody>
     </table>

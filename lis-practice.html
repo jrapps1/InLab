@@ -194,12 +194,12 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 .case-body {
   flex: 1;
   display: grid;
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr 380px;
   gap: 14px;
-  padding: 14px;
+  padding: 14px 20px;
   overflow: auto;
   align-items: start;
-  max-width: 900px;
+  max-width: 1440px;
   width: 100%;
   margin-left: auto;
   margin-right: auto;
@@ -385,13 +385,42 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
   margin-left: auto;
 }
 
-/* ── SPECIMEN DETAILS PANEL ────────────────────────────────────────────── */
-.specimen-details { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
-.spec-detail-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.spec-detail-key { font-size: 11px; color: var(--text-secondary); }
-.spec-detail-val { font-size: 12px; font-weight: 500; text-align: right; color: var(--text-primary); }
-.spec-detail-val.flag { color: var(--cnc-red); font-weight: 600; }
-.spec-divider { border: none; border-top: 1px solid var(--form-line); }
+/* ── SPECIMEN OBSERVATIONS TABLE ───────────────────────────────────────── */
+.specimen-details { padding: 0; overflow: hidden; }
+.obs-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.obs-th-field {
+  padding: 5px 10px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  background: #F3F4F6; color: var(--text-muted); text-align: left; width: 80px;
+}
+.obs-th-received {
+  padding: 5px 10px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  background: #EFF6FF; color: #1E40AF; text-align: left;
+}
+.obs-th-required {
+  padding: 5px 10px;
+  font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px;
+  background: #F0FDF4; color: #166534; text-align: left;
+}
+.obs-td-field {
+  padding: 7px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.5px; color: var(--text-muted); background: #F9FAFB;
+  vertical-align: top; border-top: 1px solid var(--form-line); white-space: nowrap;
+}
+.obs-td-received {
+  padding: 7px 10px; font-size: 12px; font-weight: 500; color: var(--text-primary);
+  vertical-align: top; border-top: 1px solid var(--form-line); line-height: 1.35;
+}
+.obs-td-received.flag { color: var(--reject); font-weight: 600; }
+.obs-td-required {
+  padding: 7px 10px; font-size: 11px; color: var(--text-secondary);
+  vertical-align: top; border-top: 1px solid var(--form-line); line-height: 1.35;
+}
+.obs-note-row {
+  padding: 6px 10px; font-size: 11px; color: var(--reject); font-weight: 500;
+  background: var(--reject-light); border-top: 1px solid #FFCDD2; line-height: 1.4;
+}
 
 /* ── DECISION PANEL ────────────────────────────────────────────────────── */
 .decision-panel { padding: 14px; }
@@ -561,7 +590,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 }
 .feedback-card {
   width: 100%;
-  max-width: 720px;
+  max-width: 920px;
   background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
@@ -649,7 +678,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 }
 .summary-header-card {
   width: 100%;
-  max-width: 860px;
+  max-width: 1200px;
   background: var(--sys-dark);
   border-radius: var(--radius);
   padding: 20px 24px;
@@ -667,7 +696,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 
 .summary-table-wrap {
   width: 100%;
-  max-width: 860px;
+  max-width: 1200px;
   background: var(--surface);
   border-radius: var(--radius);
   overflow: hidden;
@@ -739,6 +768,116 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 }
 .btn-new-session:hover { background: var(--cnc-red-dark); }
 
+/* ── WORKLIST SCREEN ───────────────────────────────────────────────────── */
+#screen-worklist { background: var(--bg); }
+.worklist-body {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.wl-panel {
+  width: 100%;
+  max-width: 1200px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid #D8DCE3;
+  overflow: hidden;
+}
+.wl-header {
+  background: var(--sys-dark);
+  color: #B0C4DE;
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.wl-header-title { font-size: 11px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; }
+.wl-header-tag { background: rgba(255,255,255,0.12); padding: 2px 9px; border-radius: 10px; font-size: 10px; }
+.wl-meta {
+  padding: 7px 16px;
+  background: #F3F4F6;
+  border-bottom: 1px solid #E5E7EB;
+  font-size: 11px;
+  color: var(--text-muted);
+  display: flex;
+  gap: 24px;
+  font-family: var(--mono);
+}
+.wl-meta span strong { color: var(--text-secondary); }
+.wl-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.wl-table th {
+  background: #F9FAFB;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-muted);
+  border-bottom: 2px solid var(--form-line);
+  font-weight: 700;
+}
+.wl-table td { padding: 9px 12px; border-bottom: 1px solid #F0F1F3; vertical-align: middle; }
+.wl-table tr:last-child td { border-bottom: none; }
+.wl-row-pending { cursor: pointer; }
+.wl-row-pending:hover td { background: #F0F7FF; }
+.wl-row-complete td { color: var(--text-secondary); }
+.wl-acc { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+.wl-patient { font-weight: 600; color: var(--text-primary); }
+.wl-row-complete .wl-patient { color: var(--text-secondary); font-weight: 400; }
+.wl-source { max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-muted); font-size: 11px; }
+.wl-time { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+.wl-status {
+  font-size: 10px; font-weight: 700;
+  padding: 3px 9px; border-radius: 10px;
+  display: inline-block; white-space: nowrap;
+}
+.wl-status-pending   { background: #F1F5F9; color: #64748B; }
+.wl-status-correct   { background: var(--accept-light); color: var(--accept); }
+.wl-status-partial   { background: #FFF3E0; color: #E65100; }
+.wl-status-incorrect { background: var(--reject-light); color: var(--reject); }
+.btn-wl-open {
+  padding: 5px 12px;
+  background: var(--sys-dark); color: #B0C4DE;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 3px; font-size: 11px; font-weight: 600;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.btn-wl-open:hover { background: var(--cnc-red); color: #fff; border-color: var(--cnc-red); }
+.wl-complete-banner {
+  width: 100%; max-width: 1200px;
+  background: var(--accept-light);
+  border: 1px solid var(--accept-border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+}
+.wl-complete-banner p { font-size: 13px; color: var(--accept); font-weight: 600; }
+.wl-complete-actions { display: flex; gap: 10px; }
+.btn-new-worklist {
+  padding: 11px 22px; background: var(--cnc-red); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-new-worklist:hover { background: var(--cnc-red-dark); }
+.btn-view-summary {
+  padding: 11px 22px; background: var(--sys-dark); color: #fff;
+  border: none; border-radius: var(--radius);
+  font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+}
+.btn-view-summary:hover { background: var(--sys-mid); }
+.btn-header-link {
+  background: rgba(255,255,255,0.07); color: #8BA0B5;
+  border: 1px solid rgba(255,255,255,0.1);
+  padding: 4px 10px; border-radius: 3px;
+  font-size: 11px; cursor: pointer; font-family: var(--sans); transition: all 0.15s;
+}
+.btn-header-link:hover { background: rgba(255,255,255,0.15); color: #fff; }
+.feedback-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
 /* ── UTILITY ───────────────────────────────────────────────────────────── */
 .hidden { display: none !important; }
 .alert-banner {
@@ -765,28 +904,75 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
           <div class="login-college-sub">Health Sciences — Medical Laboratory Technology</div>
         </div>
       </div>
-      <div class="login-card-title">LIS Training — Practice Module</div>
-      <div class="login-card-sub">Laboratory Information System Specimen Accessioning</div>
+      <div class="login-card-title">Microbiology Accessioning</div>
+      <div class="login-card-sub">CNC Health Sciences Laboratory — Specimen Inbox</div>
     </div>
     <div class="login-card-body">
       <div class="form-field">
-        <label class="form-label" for="input-tech-id">Tech ID / Student Initials</label>
+        <label class="form-label" for="input-tech-id">Tech ID / Initials</label>
         <input class="form-input" type="text" id="input-tech-id" placeholder="e.g. JDS or T2045" maxlength="12" autocomplete="off">
-        <p class="form-hint">Enter your assigned Tech ID or your initials. This will appear on your exported results.</p>
-      </div>
-      <div class="form-field">
-        <label class="form-label" for="input-case-count">Number of Cases</label>
-        <select class="form-input" id="input-case-count">
-          <option value="8">8 cases</option>
-          <option value="10" selected>10 cases (recommended)</option>
-          <option value="12">12 cases</option>
-        </select>
+        <p class="form-hint">Your Tech ID will appear on your session summary and exported results.</p>
       </div>
       <div id="login-error" class="alert-banner alert-error hidden">Please enter your Tech ID or initials to continue.</div>
-      <button class="btn-primary" onclick="startSession()">Begin Session →</button>
+      <button class="btn-primary" onclick="startSession()">Sign In →</button>
       <div class="login-info-box">
-        <p>You will review a series of microbiology requisitions and specimen labels. For each case, decide whether to <strong>Accept</strong> or <strong>Reject</strong> the specimen. If rejecting, select all applicable reasons. Immediate feedback is provided after each case.</p>
+        <p>Signing in loads a fresh specimen queue of 10 cases. Review each requisition and specimen, make your accept/reject decision, select plating media, and receive immediate feedback. A new queue can be generated at any time.</p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SCREEN: WORKLIST
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-worklist" class="screen">
+  <div class="sys-header">
+    <div class="header-left">
+      <span class="cnc-badge">CNC</span>
+      <div>
+        <div class="header-sys-name">College of New Caledonia — Health Sciences</div>
+        <div class="header-title">LIS TRAINING — MICROBIOLOGY ACCESSIONING</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <span class="header-student">Tech ID: <strong id="wl-student-id">—</strong></span>
+      <span class="header-clock" id="wl-clock">00:00:00</span>
+      <button class="btn-header-link" onclick="resetSession()">Log Out</button>
+    </div>
+  </div>
+  <div class="progress-bar-wrap">
+    <span class="progress-label">SESSION PROGRESS</span>
+    <div class="progress-track"><div class="progress-fill" id="wl-progress-fill" style="width:0%"></div></div>
+    <span class="progress-count" id="wl-progress-count">0 / 10</span>
+  </div>
+  <div class="worklist-body">
+    <div id="wl-complete-banner" class="wl-complete-banner hidden">
+      <p>✓ All specimens processed — session complete.</p>
+      <div class="wl-complete-actions">
+        <button class="btn-new-worklist" onclick="generateNewWorklist()">New Worklist</button>
+        <button class="btn-view-summary" onclick="renderSummary(); showScreen('screen-summary')">View Summary &amp; Export CSV</button>
+      </div>
+    </div>
+    <div class="wl-panel">
+      <div class="wl-header">
+        <span class="wl-header-title">Microbiology Accessioning Queue</span>
+        <span class="wl-header-tag" id="wl-queue-tag">10 Pending</span>
+      </div>
+      <div class="wl-meta" id="wl-meta"></div>
+      <table class="wl-table">
+        <thead>
+          <tr>
+            <th>Status</th>
+            <th>Accession #</th>
+            <th>Patient</th>
+            <th>Specimen Type</th>
+            <th>Source</th>
+            <th>Received</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="wl-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -804,8 +990,9 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
       </div>
     </div>
     <div class="header-right">
+      <button class="btn-header-link" onclick="returnToWorklist()">← Worklist</button>
       <span class="header-student">Tech ID: <strong id="header-student-id">—</strong></span>
-      <span class="header-clock" id="header-clock">00:00:00</span>
+      <span class="header-clock" id="header-clock">--:--:--</span>
     </div>
   </div>
 
@@ -919,7 +1106,10 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
   </div>
   <div class="feedback-body">
     <div class="feedback-card" id="feedback-card"><!-- rendered by JS --></div>
-    <button class="btn-next-case" id="btn-next-case" onclick="nextCase()">Continue to Next Case →</button>
+    <div class="feedback-actions">
+      <button class="btn-next-case" id="btn-next-case" onclick="returnToWorklist()">← Return to Worklist</button>
+      <button class="btn-new-worklist" id="btn-new-worklist-feedback" style="display:none" onclick="generateNewWorklist()">New Worklist →</button>
+    </div>
   </div>
 </div>
 
@@ -958,7 +1148,8 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
     </div>
     <div class="summary-actions">
       <button class="btn-export" onclick="exportCSV()">⬇ Download Results (CSV)</button>
-      <button class="btn-new-session" onclick="resetSession()">Start New Session</button>
+      <button class="btn-new-session" onclick="showScreen('screen-worklist')">← Back to Worklist</button>
+      <button class="btn-export" onclick="resetSession()">Log Out</button>
     </div>
   </div>
 </div>
@@ -1373,6 +1564,19 @@ function generateOneCase(num, category) {
   let specNotes = '';
   let flagNotes = '';
 
+  // Per-test standard descriptions (blood culture quantity depends on what was ordered)
+  let specStandardQty = spec.notes;
+  let specRequiredContainer = spec.validContainers[0];
+  if (spec.type === 'Blood Culture') {
+    const isSingle = test === 'Aerobic Blood Culture';
+    specRequiredContainer = isSingle ? '1 aerobic blood culture bottle' : spec.validContainers[0];
+    specStandardQty = isSingle
+      ? '1 aerobic blood culture bottle, filled to fill line'
+      : 'Aerobic and anaerobic blood culture bottles, both filled to fill line';
+    qty = specStandardQty;
+  }
+  let stabilityHours = null, stabilityMaxHours = null;
+
   if (errors.includes('specimen_wrong_container')) {
     container = rand(spec.wrongContainers);
     flagNotes = `⚠ Container: ${container}`;
@@ -1386,8 +1590,9 @@ function generateOneCase(num, category) {
     flagNotes += (flagNotes ? ' | ' : '') + `⚠ Quantity: ${qty}`;
   }
   if (errors.includes('specimen_stability_age')) {
-    // Pretend the collection time was much earlier
     const oldHours = randInt(spec.maxHours + 2, spec.maxHours + 24);
+    stabilityHours = oldHours;
+    stabilityMaxHours = spec.maxHours;
     const oldDate = genDate(oldHours);
     label.date = oldDate.display;
     label.time = oldDate.time;
@@ -1412,6 +1617,7 @@ function generateOneCase(num, category) {
     patient: { firstName, lastName, fullName, dob, phn },
     spec, source, test, physician, collected,
     label, req, container, transport, qty, specNotes, flagNotes,
+    specStandardQty, specRequiredContainer, stabilityHours, stabilityMaxHours,
     errors,
     verdict: errors.length === 0 ? 'ACCEPT' : 'REJECT',
     correctReasons: errors.map(e => ERROR_META[e]?.desc).filter(Boolean),
@@ -1427,17 +1633,20 @@ const state = {
   decision: null,
   sessionStart: null,
   clockInterval: null,
+  worklistGeneratedAt: null,
 };
 
 /* ── CLOCK ───────────────────────────────────────────────────────────── */
 function startClock() {
   state.sessionStart = Date.now();
-  state.clockInterval = setInterval(() => {
-    const s = Math.floor((Date.now() - state.sessionStart) / 1000);
-    const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
-    document.getElementById('header-clock').textContent =
-      `${padTwo(h)}:${padTwo(m)}:${padTwo(sec)}`;
-  }, 1000);
+  function tick() {
+    const d = new Date();
+    const t = `${padTwo(d.getHours())}:${padTwo(d.getMinutes())}:${padTwo(d.getSeconds())}`;
+    document.getElementById('header-clock').textContent = t;
+    document.getElementById('wl-clock').textContent = t;
+  }
+  tick();
+  state.clockInterval = setInterval(tick, 1000);
 }
 
 /* ── START SESSION ───────────────────────────────────────────────────── */
@@ -1447,16 +1656,17 @@ function startSession() {
     document.getElementById('login-error').classList.remove('hidden');
     return;
   }
-  const n = parseInt(document.getElementById('input-case-count').value);
   state.studentId = id;
-  state.cases = generateCases(n);
+  state.cases = generateCases(10);
   state.results = [];
   state.currentIndex = 0;
+  state.worklistGeneratedAt = new Date();
   document.getElementById('header-student-id').textContent = id;
   document.getElementById('feedback-student-id').textContent = id;
-  showScreen('screen-case');
+  document.getElementById('wl-student-id').textContent = id;
   startClock();
-  renderCase();
+  renderWorklist();
+  showScreen('screen-worklist');
 }
 
 /* ── SCREEN TRANSITIONS ─────────────────────────────────────────────── */
@@ -1607,28 +1817,44 @@ function renderLabel(c) {
 }
 
 function renderSpecimenDetails(c) {
-  const flag = c.flagNotes ? 'flag' : '';
+  const contFlag  = c.errors.includes('specimen_wrong_container') || c.errors.includes('specimen_inadequate_fixative');
+  const transpFlag = c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp');
+  const qtyFlag   = c.errors.includes('specimen_insufficient') || c.errors.includes('specimen_too_large');
+
+  const reqContainer = c.specRequiredContainer || c.spec.validContainers[0];
+  const reqTransport  = c.spec.validTransport[0];
+  const standardQty   = c.specStandardQty || c.spec.notes || '';
+
+  const leakNote = c.specNotes
+    ? `<div class="obs-note-row">⚠ ${c.specNotes}</div>`
+    : '';
+
   return `
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Container Observed</span>
-      <span class="spec-detail-val ${flag && c.errors.includes('specimen_wrong_container') ? 'flag' : ''}">${c.container}</span>
-    </div>
-    <hr class="spec-divider">
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Transport Condition</span>
-      <span class="spec-detail-val ${c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp') ? 'flag' : ''}">${c.transport}</span>
-    </div>
-    <hr class="spec-divider">
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Quantity / Appearance</span>
-      <span class="spec-detail-val ${c.errors.includes('specimen_insufficient') ? 'flag' : ''}">${c.qty}</span>
-    </div>
-    ${c.specNotes ? `<hr class="spec-divider"><div class="spec-detail-row"><span class="spec-detail-key">Notes</span><span class="spec-detail-val flag">${c.specNotes}</span></div>` : ''}
-    <hr class="spec-divider">
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Expected Container</span>
-      <span class="spec-detail-val">${c.spec.validContainers[0]}</span>
-    </div>
+    <table class="obs-table">
+      <thead><tr>
+        <th class="obs-th-field"></th>
+        <th class="obs-th-received">Received</th>
+        <th class="obs-th-required">Required</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="obs-td-field">Container</td>
+          <td class="obs-td-received${contFlag ? ' flag' : ''}">${c.container}</td>
+          <td class="obs-td-required">${reqContainer}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Transport</td>
+          <td class="obs-td-received${transpFlag ? ' flag' : ''}">${c.transport}</td>
+          <td class="obs-td-required">${reqTransport}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Qty / Appear.</td>
+          <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${c.qty}</td>
+          <td class="obs-td-required">${standardQty}</td>
+        </tr>
+      </tbody>
+    </table>
+    ${leakNote}
   `;
 }
 
@@ -1742,7 +1968,6 @@ function finaliseCase(c, platingResult) {
 /* ── RENDER FEEDBACK ─────────────────────────────────────────────────── */
 function renderFeedback(c, studentDecision, studentReasons, correct, missed, extra, score, platingResult) {
   const card = document.getElementById('feedback-card');
-  const isLast = state.currentIndex >= state.cases.length - 1;
 
   const titles = { correct: 'Correct!', partial: 'Partially Correct', incorrect: 'Incorrect' };
   const icons  = { correct: '✓', partial: '~', incorrect: '✗' };
@@ -1844,21 +2069,87 @@ function renderFeedback(c, studentDecision, studentReasons, correct, missed, ext
     </div>
   `;
 
-  document.getElementById('btn-next-case').textContent =
-    isLast ? 'View Session Summary →' : 'Continue to Next Case →';
+  const allDone = state.results.length >= state.cases.length;
+  document.getElementById('btn-next-case').textContent = '← Return to Worklist';
+  document.getElementById('btn-new-worklist-feedback').style.display = allDone ? '' : 'none';
 }
 
-/* ── NEXT CASE / SUMMARY ─────────────────────────────────────────────── */
-function nextCase() {
-  state.currentIndex++;
-  if (state.currentIndex >= state.cases.length) {
-    renderSummary();
-    showScreen('screen-summary');
-  } else {
-    showScreen('screen-case');
-    renderCase();
+/* ── WORKLIST ─────────────────────────────────────────────────────────── */
+function renderWorklist() {
+  const total = state.cases.length;
+  const done  = state.results.length;
+  const allDone = done >= total;
+
+  document.getElementById('wl-progress-fill').style.width = `${(done / total) * 100}%`;
+  document.getElementById('wl-progress-count').textContent = `${done} / ${total}`;
+  document.getElementById('wl-queue-tag').textContent =
+    allDone ? 'All Reviewed' : `${total - done} Pending`;
+
+  if (state.worklistGeneratedAt) {
+    const d = state.worklistGeneratedAt;
+    const genStr = d.toLocaleDateString('en-CA') + '  ' +
+      `${padTwo(d.getHours())}:${padTwo(d.getMinutes())}:${padTwo(d.getSeconds())}`;
+    const wlId = state.cases[0]?.reqNum?.slice(-5) || '—';
+    document.getElementById('wl-meta').innerHTML =
+      `<span>Generated: <strong>${genStr}</strong></span>` +
+      `<span>Worklist ID: <strong>WL-${wlId}</strong></span>` +
+      `<span>Workstation: <strong>LIS-MICRO-01</strong></span>`;
   }
+
+  document.getElementById('wl-tbody').innerHTML = state.cases.map((c, i) => {
+    const result = state.results.find(r => r.caseNum === c.num);
+    const last  = c.patient.lastName.toUpperCase();
+    const first = c.patient.firstName;
+    const received = c.collected ? c.collected.time : '—';
+
+    if (result) {
+      const label = { correct: '✓ Correct', partial: '~ Partial', incorrect: '✗ Incorrect' }[result.score];
+      const cls   = { correct: 'wl-status-correct', partial: 'wl-status-partial', incorrect: 'wl-status-incorrect' }[result.score];
+      return `<tr class="wl-row-complete">
+        <td><span class="wl-status ${cls}">${label}</span></td>
+        <td class="wl-acc">${c.reqNum}</td>
+        <td class="wl-patient">${last}, ${first}</td>
+        <td>${c.spec.type}</td>
+        <td class="wl-source">${c.source}</td>
+        <td class="wl-time">${received}</td>
+        <td></td>
+      </tr>`;
+    }
+    return `<tr class="wl-row-pending" onclick="openCase(${i})">
+      <td><span class="wl-status wl-status-pending">● Pending</span></td>
+      <td class="wl-acc">${c.reqNum}</td>
+      <td class="wl-patient">${last}, ${first}</td>
+      <td>${c.spec.type}</td>
+      <td class="wl-source">${c.source}</td>
+      <td class="wl-time">${received}</td>
+      <td><button class="btn-wl-open" onclick="event.stopPropagation();openCase(${i})">Open →</button></td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('wl-complete-banner').classList.toggle('hidden', !allDone);
 }
+
+function openCase(idx) {
+  state.currentIndex = idx;
+  showScreen('screen-case');
+  renderCase();
+}
+
+function returnToWorklist() {
+  renderWorklist();
+  showScreen('screen-worklist');
+}
+
+function generateNewWorklist() {
+  state.cases = generateCases(10);
+  state.results = [];
+  state.currentIndex = 0;
+  state.worklistGeneratedAt = new Date();
+  renderWorklist();
+  showScreen('screen-worklist');
+}
+
+function nextCase() { returnToWorklist(); }
 
 /* ── RENDER SUMMARY ──────────────────────────────────────────────────── */
 function renderSummary() {

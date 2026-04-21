@@ -138,7 +138,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 
 /* ── CASE SCREEN ───────────────────────────────────────────────────────── */
 #screen-case { background: var(--bg); }
-.case-body { flex: 1; display: grid; grid-template-columns: 1fr 300px; gap: 14px; padding: 14px; overflow: auto; align-items: start; max-width: 900px; width: 100%; margin-left: auto; margin-right: auto; }
+.case-body { flex: 1; display: grid; grid-template-columns: 1fr 380px; gap: 14px; padding: 14px 20px; overflow: auto; align-items: start; max-width: 1440px; width: 100%; margin-left: auto; margin-right: auto; }
 .case-requisition-col { display: flex; flex-direction: column; gap: 14px; }
 .case-right-col { display: flex; flex-direction: column; gap: 14px; }
 
@@ -179,13 +179,17 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 .label-val.missing { color: transparent; min-height: 18px; display: block; }
 .label-spec-type { font-size: 10px; background: var(--sys-dark); color: #fff; padding: 2px 6px; border-radius: 2px; align-self: center; margin-left: auto; }
 
-/* ── SPECIMEN DETAILS ──────────────────────────────────────────────────── */
-.specimen-details { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
-.spec-detail-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-.spec-detail-key { font-size: 11px; color: var(--text-secondary); }
-.spec-detail-val { font-size: 12px; font-weight: 500; text-align: right; color: var(--text-primary); }
-.spec-detail-val.flag { color: var(--cnc-red); font-weight: 600; }
-.spec-divider { border: none; border-top: 1px solid var(--form-line); }
+/* ── SPECIMEN OBSERVATIONS TABLE ───────────────────────────────────────── */
+.specimen-details { padding: 0; overflow: hidden; }
+.obs-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.obs-th-field { padding: 5px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; background: #F3F4F6; color: var(--text-muted); text-align: left; width: 80px; }
+.obs-th-received { padding: 5px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; background: #EFF6FF; color: #1E40AF; text-align: left; }
+.obs-th-required { padding: 5px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.6px; background: #F0FDF4; color: #166534; text-align: left; }
+.obs-td-field { padding: 7px 10px; font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); background: #F9FAFB; vertical-align: top; border-top: 1px solid var(--form-line); white-space: nowrap; }
+.obs-td-received { padding: 7px 10px; font-size: 12px; font-weight: 500; color: var(--text-primary); vertical-align: top; border-top: 1px solid var(--form-line); line-height: 1.35; }
+.obs-td-received.flag { color: var(--reject); font-weight: 600; }
+.obs-td-required { padding: 7px 10px; font-size: 11px; color: var(--text-secondary); vertical-align: top; border-top: 1px solid var(--form-line); line-height: 1.35; }
+.obs-note-row { padding: 6px 10px; font-size: 11px; color: var(--reject); font-weight: 500; background: var(--reject-light); border-top: 1px solid #FFCDD2; line-height: 1.4; }
 
 /* ── DECISION ──────────────────────────────────────────────────────────── */
 .decision-panel { padding: 14px; }
@@ -228,12 +232,12 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
 /* ── SUMMARY ───────────────────────────────────────────────────────────── */
 #screen-summary { background: var(--bg); }
 .summary-body { flex: 1; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
-.summary-header-card { width: 100%; max-width: 900px; background: var(--sys-dark); border-radius: var(--radius); padding: 20px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+.summary-header-card { width: 100%; max-width: 1200px; background: var(--sys-dark); border-radius: var(--radius); padding: 20px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
 .summary-student { font-size: 13px; color: #8BA0B5; }
 .summary-student strong { color: #fff; font-family: var(--mono); }
 .summary-badge { background: var(--cnc-red); color: #fff; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
-.summary-notice { width: 100%; max-width: 900px; }
-.summary-table-wrap { width: 100%; max-width: 900px; background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid #D8DCE3; }
+.summary-notice { width: 100%; max-width: 1200px; }
+.summary-table-wrap { width: 100%; max-width: 1200px; background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid #D8DCE3; }
 .summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
 .summary-table th { background: #F3F4F6; padding: 9px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); border-bottom: 2px solid var(--form-line); }
 .summary-table td { padding: 9px 12px; border-bottom: 1px solid #F0F1F3; vertical-align: top; }
@@ -985,6 +989,17 @@ function buildRenderableCase(cfg, idx) {
   const transport = cfg.transport || defaults.transport;
   const notes     = cfg.notes || '';
 
+  // Blood culture: standard description depends on what was ordered
+  let specStandardQty = '';
+  let specRequiredContainer = defaults.container || '';
+  if (specType === 'Blood Culture') {
+    const isSingle = defaults.test === 'Aerobic Blood Culture' || (cfg.container || '').toLowerCase().includes('aerobic') && !(cfg.container || '').toLowerCase().includes('anaerobic');
+    specRequiredContainer = isSingle ? '1 aerobic blood culture bottle' : 'Blood culture bottles (aerobic + anaerobic set)';
+    specStandardQty = isSingle
+      ? '1 aerobic blood culture bottle, filled to fill line'
+      : 'Aerobic and anaerobic blood culture bottles, both filled to fill line';
+  }
+
   return {
     num: idx + 1,
     reqNum: reqNum(),
@@ -994,6 +1009,7 @@ function buildRenderableCase(cfg, idx) {
     container, transport,
     qty: notes || `${specType} — see physical specimen`,
     specNotes: errors.includes('specimen_leaking') ? 'Visible leakage noted on exterior of container.' : '',
+    specStandardQty, specRequiredContainer,
     errors,
     verdict: errors.length === 0 ? 'ACCEPT' : 'REJECT',
     correctReasons: errors.map(e => ERROR_META[e]?.desc).filter(Boolean),
@@ -1135,23 +1151,48 @@ function renderLabel(c) {
 }
 
 function renderSpecimenDetails(c) {
-  const wrongCont = c.errors.includes('specimen_wrong_container');
-  const wrongTransp = c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp');
-  const insuff = c.errors.includes('specimen_insufficient');
+  const contFlag  = c.errors.includes('specimen_wrong_container') || c.errors.includes('specimen_inadequate_fixative');
+  const transpFlag = c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp');
+  const qtyFlag   = c.errors.includes('specimen_insufficient') || c.errors.includes('specimen_too_large');
+
+  const defaults = SPEC_DEFAULTS[c.spec.type] || {};
+  const reqContainer = c.specRequiredContainer || defaults.container || '—';
+  const reqTransport  = defaults.transport || '—';
+  const standardQty   = c.specStandardQty || '';
+
+  const ageNote = c.errors.includes('specimen_stability_age')
+    ? `<div class="obs-note-row">⚠ Specimen age — collection date on label is outside the acceptable stability window for this specimen type</div>`
+    : '';
+  const leakNote = c.specNotes
+    ? `<div class="obs-note-row">⚠ ${c.specNotes}</div>`
+    : '';
+
   return `
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Container Observed</span>
-      <span class="spec-detail-val ${wrongCont ? 'flag' : ''}">${c.container}</span>
-    </div><hr class="spec-divider">
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Transport Condition</span>
-      <span class="spec-detail-val ${wrongTransp ? 'flag' : ''}">${c.transport}</span>
-    </div><hr class="spec-divider">
-    <div class="spec-detail-row">
-      <span class="spec-detail-key">Quantity / Appearance</span>
-      <span class="spec-detail-val ${insuff ? 'flag' : ''}">${c.qty}</span>
-    </div>
-    ${c.specNotes ? `<hr class="spec-divider"><div class="spec-detail-row"><span class="spec-detail-key">Notes</span><span class="spec-detail-val flag">${c.specNotes}</span></div>` : ''}
+    <table class="obs-table">
+      <thead><tr>
+        <th class="obs-th-field"></th>
+        <th class="obs-th-received">Received</th>
+        <th class="obs-th-required">Required</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="obs-td-field">Container</td>
+          <td class="obs-td-received${contFlag ? ' flag' : ''}">${c.container}</td>
+          <td class="obs-td-required">${reqContainer}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Transport</td>
+          <td class="obs-td-received${transpFlag ? ' flag' : ''}">${c.transport}</td>
+          <td class="obs-td-required">${reqTransport}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Qty / Appear.</td>
+          <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${c.qty}</td>
+          <td class="obs-td-required">${standardQty}</td>
+        </tr>
+      </tbody>
+    </table>
+    ${ageNote}${leakNote}
   `;
 }
 

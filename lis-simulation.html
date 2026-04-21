@@ -1,0 +1,1328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LIS Simulation — Saint Jason Memorial Hospital</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ── BRAND TOKENS ─────────────────────────────────────────────────────── */
+:root {
+  --cnc-red:        #C8102E;
+  --cnc-red-dark:   #9B0C23;
+  --cnc-red-light:  #FDECEE;
+  --sys-dark:       #0D1B2A;
+  --sys-mid:        #1B3A5C;
+  --bg:             #E8EAED;
+  --surface:        #FFFFFF;
+  --paper:          #FAFAF5;
+  --form-line:      #C4C9D4;
+  --ink:            #1A237E;
+  --text-primary:   #1A1A2E;
+  --text-secondary: #5A6478;
+  --text-muted:     #9AA5B4;
+  --accept:         #1B5E20;
+  --accept-light:   #E8F5E9;
+  --accept-border:  #388E3C;
+  --reject:         #B71C1C;
+  --reject-light:   #FFEBEE;
+  --reject-border:  #D32F2F;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'Inter', sans-serif;
+  --hand: 'Caveat', cursive;
+  --radius: 4px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; }
+body { font-family: var(--sans); background: var(--bg); color: var(--text-primary); min-height: 100vh; }
+
+.screen { display: none; flex-direction: column; min-height: 100vh; }
+.screen.active { display: flex; }
+.hidden { display: none !important; }
+
+/* ── SYSTEM HEADER ─────────────────────────────────────────────────────── */
+.sys-header {
+  background: var(--sys-dark);
+  color: #fff;
+  height: 52px;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+  border-bottom: 3px solid var(--cnc-red);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-left { display: flex; align-items: center; gap: 14px; }
+.hosp-badge {
+  background: var(--cnc-red);
+  color: #fff;
+  font-weight: 700;
+  font-size: 12px;
+  padding: 3px 8px;
+  border-radius: 3px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+}
+.header-sys-name { font-size: 11px; color: #8BA0B5; letter-spacing: 0.3px; }
+.header-title { font-size: 14px; font-weight: 600; color: #fff; }
+.header-right { display: flex; align-items: center; gap: 14px; }
+.header-clock { font-family: var(--mono); font-size: 12px; color: #6E8FAB; }
+.header-student { font-size: 12px; color: #90A4AE; }
+.header-student strong { color: #B0C4DE; }
+.btn-instructor-header {
+  background: rgba(255,255,255,0.08);
+  color: #8BA0B5;
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 4px 10px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all 0.15s;
+}
+.btn-instructor-header:hover { background: rgba(255,255,255,0.15); color: #fff; }
+
+/* ── PROGRESS BAR ──────────────────────────────────────────────────────── */
+.progress-bar-wrap {
+  background: var(--sys-mid);
+  padding: 6px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.progress-label { font-size: 11px; color: #90A4AE; font-family: var(--mono); }
+.progress-track { flex: 1; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+.progress-fill { height: 100%; background: var(--cnc-red); border-radius: 3px; transition: width 0.4s ease; }
+.progress-count { font-size: 11px; color: #90A4AE; font-family: var(--mono); white-space: nowrap; }
+
+/* ── LOGIN ─────────────────────────────────────────────────────────────── */
+#screen-login {
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(160deg, var(--sys-dark) 0%, #0a2540 100%);
+}
+.login-card { background: var(--surface); border-radius: 8px; width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); overflow: hidden; }
+.login-card-header { background: var(--sys-dark); padding: 24px 28px; color: #fff; border-bottom: 4px solid var(--cnc-red); }
+.login-logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+.login-logo-mark {
+  width: 52px; height: 52px;
+  background: var(--cnc-red);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800; font-size: 14px; letter-spacing: -0.5px; line-height: 1.2;
+  text-align: center;
+}
+.login-hosp-name { font-size: 16px; font-weight: 700; line-height: 1.3; }
+.login-hosp-sub { font-size: 11px; color: #8BA0B5; margin-top: 2px; }
+.login-card-title { font-size: 18px; font-weight: 700; }
+.login-card-sub { font-size: 12px; color: #8BA0B5; margin-top: 4px; }
+.login-card-body { padding: 28px; }
+.form-field { margin-bottom: 18px; }
+.form-label { display: block; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 6px; }
+.form-input { width: 100%; padding: 10px 12px; border: 1.5px solid #D1D5DB; border-radius: var(--radius); font-family: var(--mono); font-size: 14px; color: var(--text-primary); background: #FAFAFA; transition: border-color 0.2s; }
+.form-input:focus { outline: none; border-color: var(--cnc-red); background: #fff; }
+.btn-primary { width: 100%; padding: 12px; background: var(--cnc-red); color: #fff; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 600; cursor: pointer; letter-spacing: 0.3px; transition: background 0.2s; }
+.btn-primary:hover { background: var(--cnc-red-dark); }
+.alert-banner { padding: 8px 14px; border-radius: var(--radius); font-size: 12px; margin-top: 8px; }
+.alert-error { background: var(--reject-light); color: var(--reject); border: 1px solid #FFCDD2; }
+.alert-info { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+.alert-warning { background: #FFF8E1; color: #B45309; border: 1px solid #FDE68A; }
+
+/* ── CASE SCREEN ───────────────────────────────────────────────────────── */
+#screen-case { background: var(--bg); }
+.case-body { flex: 1; display: grid; grid-template-columns: 1fr 320px; gap: 14px; padding: 14px; overflow: auto; align-items: start; }
+.case-requisition-col { display: flex; flex-direction: column; gap: 14px; }
+.case-right-col { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── PANEL ─────────────────────────────────────────────────────────────── */
+.panel { background: var(--surface); border-radius: var(--radius); border: 1px solid #D8DCE3; overflow: hidden; }
+.panel-header { background: var(--sys-dark); color: #B0C4DE; padding: 8px 14px; font-size: 11px; font-weight: 600; letter-spacing: 0.8px; text-transform: uppercase; display: flex; align-items: center; justify-content: space-between; }
+.panel-header-tag { background: rgba(255,255,255,0.12); padding: 2px 7px; border-radius: 10px; font-size: 10px; }
+
+/* ── REQUISITION ───────────────────────────────────────────────────────── */
+.req-form { background: var(--paper); padding: 18px 22px 14px; font-size: 13px; }
+.req-form-top { display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid var(--text-primary); padding-bottom: 10px; margin-bottom: 14px; }
+.req-lab-name { font-weight: 700; font-size: 14px; }
+.req-lab-sub { font-size: 11px; color: var(--text-secondary); margin-top: 2px; }
+.req-form-title { font-size: 13px; font-weight: 700; text-align: right; }
+.req-ref { font-family: var(--mono); font-size: 10px; color: var(--text-muted); text-align: right; margin-top: 3px; }
+.req-section { margin-bottom: 12px; }
+.req-section-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--text-secondary); border-bottom: 1px solid var(--form-line); padding-bottom: 3px; margin-bottom: 8px; }
+.req-grid { display: grid; gap: 6px; }
+.req-grid-2 { grid-template-columns: 1fr 1fr; }
+.req-grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+.req-field { display: flex; flex-direction: column; gap: 1px; }
+.req-field-label { font-size: 9px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); }
+.req-field-line { border-bottom: 1px solid var(--form-line); min-height: 24px; display: flex; align-items: flex-end; padding-bottom: 2px; }
+.req-field-value { font-family: var(--hand); font-size: 18px; color: var(--ink); line-height: 1; padding-bottom: 1px; }
+.req-test-written { font-family: var(--hand); font-size: 17px; color: var(--ink); }
+.req-notes-line { font-family: var(--hand); font-size: 17px; color: var(--ink); border-bottom: 1px solid var(--form-line); min-height: 28px; display: flex; align-items: flex-end; padding-bottom: 2px; }
+.req-footer { border-top: 1px solid var(--form-line); margin-top: 10px; padding-top: 8px; display: flex; justify-content: space-between; font-size: 10px; color: var(--text-muted); }
+
+/* ── LABEL ─────────────────────────────────────────────────────────────── */
+.label-area { padding: 14px; display: flex; justify-content: center; }
+.specimen-label { width: 280px; background: #fff; border: 2px solid #333; border-radius: 3px; padding: 10px 12px; box-shadow: 2px 2px 6px rgba(0,0,0,0.15); position: relative; }
+.specimen-label::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 6px; background: repeating-linear-gradient(90deg, #C8102E 0, #C8102E 6px, #fff 6px, #fff 12px); }
+.label-body { padding-top: 4px; }
+.label-row { display: flex; border-bottom: 1px solid #DDD; padding: 4px 0; align-items: baseline; gap: 4px; }
+.label-row:last-child { border-bottom: none; }
+.label-key { font-size: 8px; text-transform: uppercase; letter-spacing: 0.5px; color: #777; min-width: 38px; flex-shrink: 0; }
+.label-val { font-family: var(--hand); font-size: 17px; color: var(--ink); line-height: 1.1; word-break: break-word; }
+.label-val.missing { color: transparent; min-height: 18px; display: block; }
+.label-spec-type { font-size: 10px; background: var(--sys-dark); color: #fff; padding: 2px 6px; border-radius: 2px; align-self: center; margin-left: auto; }
+
+/* ── SPECIMEN DETAILS ──────────────────────────────────────────────────── */
+.specimen-details { padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+.spec-detail-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.spec-detail-key { font-size: 11px; color: var(--text-secondary); }
+.spec-detail-val { font-size: 12px; font-weight: 500; text-align: right; color: var(--text-primary); }
+.spec-detail-val.flag { color: var(--cnc-red); font-weight: 600; }
+.spec-divider { border: none; border-top: 1px solid var(--form-line); }
+
+/* ── DECISION ──────────────────────────────────────────────────────────── */
+.decision-panel { padding: 14px; }
+.decision-question { font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.decision-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+.btn-accept, .btn-reject { padding: 12px 8px; border: 2px solid; border-radius: var(--radius); font-size: 13px; font-weight: 700; cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s; background: #fff; }
+.btn-accept { border-color: var(--accept-border); color: var(--accept); }
+.btn-accept:hover, .btn-accept.selected { background: var(--accept-light); border-color: var(--accept); }
+.btn-reject { border-color: var(--reject-border); color: var(--reject); }
+.btn-reject:hover, .btn-reject.selected { background: var(--reject-light); border-color: var(--reject); }
+.reasons-section { display: none; }
+.reasons-section.visible { display: block; }
+.reasons-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 8px; }
+.reasons-category { margin-bottom: 10px; }
+.reasons-cat-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 5px; padding-bottom: 3px; border-bottom: 1px solid var(--form-line); }
+.reason-item { display: flex; align-items: flex-start; gap: 7px; padding: 4px 0; cursor: pointer; }
+.reason-item:hover { background: #F9FAFB; border-radius: 3px; }
+.reason-cb { width: 14px; height: 14px; border: 1.5px solid #9CA3AF; border-radius: 2px; flex-shrink: 0; margin-top: 1px; accent-color: var(--cnc-red); }
+.reason-text { font-size: 12px; line-height: 1.4; }
+.btn-submit-case { width: 100%; padding: 11px; background: var(--sys-dark); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; margin-top: 12px; letter-spacing: 0.3px; transition: background 0.2s; }
+.btn-submit-case:hover { background: var(--sys-mid); }
+.btn-submit-case:disabled { opacity: 0.4; cursor: not-allowed; }
+/* ── PLATING STEP ──────────────────────────────────────────────────────── */
+.plating-step-header { font-size:12px; font-weight:600; color:var(--accept); background:var(--accept-light); border:1px solid var(--accept-border); border-radius:var(--radius); padding:8px 12px; margin-bottom:12px; }
+.plating-skip-msg { font-size:12px; color:#1565C0; background:#EFF6FF; border:1px solid #BFDBFE; border-radius:var(--radius); padding:10px 12px; margin-bottom:12px; line-height:1.5; }
+.plating-note { font-size:11px; color:var(--text-muted); font-style:italic; margin-bottom:10px; }
+.plating-group { margin-bottom:10px; }
+.plating-group-title { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:0.6px; color:var(--text-muted); margin-bottom:5px; padding-bottom:3px; border-bottom:1px solid var(--form-line); }
+.plating-item { display:flex; align-items:flex-start; gap:7px; padding:3px 0; cursor:pointer; }
+.plating-item:hover { background:#F9FAFB; border-radius:3px; }
+.plate-cb { width:14px; height:14px; flex-shrink:0; margin-top:1px; accent-color:var(--accept); }
+.plate-label { font-size:12px; line-height:1.3; }
+.plate-label .plate-abbr { font-weight:700; color:var(--sys-dark); }
+.btn-submit-plating { width:100%; padding:11px; background:var(--accept); color:#fff; border:none; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; }
+.btn-submit-plating:hover { background:#1B5E20; }
+.btn-confirm-skip { width:100%; padding:11px; background:var(--sys-dark); color:#fff; border:none; border-radius:var(--radius); font-size:13px; font-weight:600; cursor:pointer; margin-top:12px; transition:background 0.2s; }
+.btn-confirm-skip:hover { background:var(--sys-mid); }
+.no-feedback-notice { background: #F3F4F6; border: 1px solid #E5E7EB; border-radius: var(--radius); padding: 8px 12px; font-size: 11px; color: var(--text-secondary); margin-top: 10px; text-align: center; }
+
+/* ── SUMMARY ───────────────────────────────────────────────────────────── */
+#screen-summary { background: var(--bg); }
+.summary-body { flex: 1; padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.summary-header-card { width: 100%; max-width: 900px; background: var(--sys-dark); border-radius: var(--radius); padding: 20px 24px; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+.summary-student { font-size: 13px; color: #8BA0B5; }
+.summary-student strong { color: #fff; font-family: var(--mono); }
+.summary-badge { background: var(--cnc-red); color: #fff; padding: 6px 14px; border-radius: 3px; font-size: 13px; font-weight: 700; letter-spacing: 0.5px; }
+.summary-notice { width: 100%; max-width: 900px; }
+.summary-table-wrap { width: 100%; max-width: 900px; background: var(--surface); border-radius: var(--radius); overflow: hidden; border: 1px solid #D8DCE3; }
+.summary-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.summary-table th { background: #F3F4F6; padding: 9px 12px; text-align: left; font-size: 10px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); border-bottom: 2px solid var(--form-line); }
+.summary-table td { padding: 9px 12px; border-bottom: 1px solid #F0F1F3; vertical-align: top; }
+.summary-table tr:last-child td { border-bottom: none; }
+.td-case { font-family: var(--mono); font-size: 11px; color: var(--text-muted); }
+.pill { display: inline-block; padding: 2px 7px; border-radius: 10px; font-size: 10px; font-weight: 600; }
+.pill-accept { background: var(--accept-light); color: var(--accept); }
+.pill-reject { background: var(--reject-light); color: var(--reject); }
+.summary-actions { display: flex; gap: 12px; }
+.btn-export { padding: 12px 28px; background: var(--sys-dark); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-export:hover { background: var(--sys-mid); }
+.btn-new-session { padding: 12px 28px; background: var(--cnc-red); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; transition: background 0.2s; }
+.btn-new-session:hover { background: var(--cnc-red-dark); }
+
+/* ── INSTRUCTOR MODAL ──────────────────────────────────────────────────── */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; display: flex; align-items: flex-start; justify-content: center; padding: 20px; overflow-y: auto; }
+.modal-overlay.hidden { display: none; }
+.modal { background: var(--surface); border-radius: 8px; width: 100%; max-width: 860px; box-shadow: 0 24px 80px rgba(0,0,0,0.5); }
+.modal-header { background: var(--sys-dark); padding: 16px 22px; display: flex; justify-content: space-between; align-items: center; border-radius: 8px 8px 0 0; border-bottom: 3px solid var(--cnc-red); }
+.modal-header h2 { font-size: 15px; font-weight: 700; color: #fff; }
+.modal-header-sub { font-size: 11px; color: #8BA0B5; margin-top: 2px; }
+.btn-modal-close { background: rgba(255,255,255,0.1); border: none; color: #8BA0B5; font-size: 18px; cursor: pointer; padding: 4px 10px; border-radius: 3px; }
+.btn-modal-close:hover { color: #fff; }
+.modal-body { padding: 22px; }
+.modal-section-title { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-secondary); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 2px solid var(--form-line); }
+
+/* Instructor password screen */
+.instr-pw-wrap { padding: 40px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.instr-pw-wrap h3 { font-size: 16px; font-weight: 600; }
+.instr-pw-wrap p { font-size: 13px; color: var(--text-secondary); text-align: center; }
+
+/* Case list */
+.case-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+.case-card { border: 1.5px solid #E5E7EB; border-radius: var(--radius); overflow: hidden; }
+.case-card-header { background: #F9FAFB; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+.case-card-header:hover { background: #F3F4F6; }
+.case-card-num { font-family: var(--mono); font-size: 12px; font-weight: 700; color: var(--sys-dark); }
+.case-card-summary { font-size: 12px; color: var(--text-secondary); }
+.case-card-actions { display: flex; gap: 6px; }
+.btn-sm { padding: 3px 10px; border-radius: 3px; font-size: 11px; font-weight: 600; cursor: pointer; border: 1.5px solid; }
+.btn-sm-edit { border-color: var(--sys-mid); color: var(--sys-mid); background: #fff; }
+.btn-sm-edit:hover { background: #EFF6FF; }
+.btn-sm-del { border-color: var(--reject-border); color: var(--reject); background: #fff; }
+.btn-sm-del:hover { background: var(--reject-light); }
+.case-card-body { padding: 14px; border-top: 1px solid #E5E7EB; }
+.case-card-body.collapsed { display: none; }
+
+/* Case form inside modal */
+.case-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+.case-form-grid-3 { grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.cf-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-secondary); margin-bottom: 4px; display: block; }
+.cf-input { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: var(--radius); font-size: 13px; font-family: var(--sans); }
+.cf-input:focus { outline: none; border-color: var(--cnc-red); }
+.cf-select { width: 100%; padding: 7px 10px; border: 1.5px solid #D1D5DB; border-radius: var(--radius); font-size: 13px; font-family: var(--sans); background: #fff; }
+.cf-select:focus { outline: none; border-color: var(--cnc-red); }
+
+.errors-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 16px; }
+.error-check { display: flex; align-items: flex-start; gap: 6px; padding: 3px 0; }
+.error-check input[type=checkbox] { margin-top: 2px; accent-color: var(--cnc-red); flex-shrink: 0; }
+.error-check label { font-size: 12px; color: var(--text-primary); cursor: pointer; line-height: 1.3; }
+.errors-cat { margin-bottom: 10px; }
+.errors-cat-title { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 5px; }
+
+.modal-footer { padding: 16px 22px; border-top: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.btn-save-case { padding: 9px 22px; background: var(--cnc-red); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-save-case:hover { background: var(--cnc-red-dark); }
+.btn-add-case { padding: 9px 22px; background: var(--sys-dark); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-add-case:hover { background: var(--sys-mid); }
+.btn-clear-cases { padding: 9px 18px; background: #fff; color: var(--reject); border: 1.5px solid var(--reject-border); border-radius: var(--radius); font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-clear-cases:hover { background: var(--reject-light); }
+.instr-save-note { font-size: 11px; color: var(--text-muted); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     INSTRUCTOR MODAL
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="modal-instructor" class="modal-overlay hidden">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <h2>Instructor Configuration — Simulation Cases</h2>
+        <div class="modal-header-sub">Saint Jason Memorial Hospital · LIS Simulation Module</div>
+      </div>
+      <button class="btn-modal-close" onclick="closeInstructor()">✕</button>
+    </div>
+
+    <!-- Password gate -->
+    <div id="instr-pw-screen">
+      <div class="instr-pw-wrap">
+        <h3>Instructor Access</h3>
+        <p>Enter the instructor password to configure simulation cases.</p>
+        <div style="width:100%;max-width:320px">
+          <label class="form-label" for="instr-pw-input">Password</label>
+          <input class="form-input" type="password" id="instr-pw-input" placeholder="Enter password" onkeydown="if(event.key==='Enter')checkInstrPw()">
+          <div id="instr-pw-error" class="alert-banner alert-error hidden" style="margin-top:8px">Incorrect password.</div>
+          <button class="btn-primary" style="margin-top:12px" onclick="checkInstrPw()">Unlock →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Case editor (shown after auth) -->
+    <div id="instr-editor-screen" class="hidden">
+      <div class="modal-body">
+        <div class="modal-section-title">Configured Cases (<span id="case-count-label">0</span>)</div>
+        <div id="case-list-wrap" class="case-list">
+          <p style="font-size:13px;color:var(--text-muted);padding:12px 0">No cases configured yet. Click "Add Case" to begin.</p>
+        </div>
+
+        <!-- New / Edit case form -->
+        <div id="case-form-panel" class="hidden">
+          <div class="modal-section-title" id="case-form-title">Add New Case</div>
+
+          <div class="case-form-grid">
+            <div>
+              <label class="cf-label">Case Label (e.g. "Specimen A" or "Station 1")</label>
+              <input class="cf-input" type="text" id="cf-label" placeholder="Specimen A">
+            </div>
+            <div>
+              <label class="cf-label">Specimen Type</label>
+              <select class="cf-select" id="cf-spec-type">
+                <option value="">— Select —</option>
+                <option>Urine</option>
+                <option>Blood Culture</option>
+                <option>Wound Swab</option>
+                <option>Sputum</option>
+                <option>Stool</option>
+                <option>Throat Swab</option>
+                <option>Nasopharyngeal Swab</option>
+                <option>CSF</option>
+                <option>Tissue</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="case-form-grid">
+            <div>
+              <label class="cf-label">Patient Name (leave blank to auto-generate)</label>
+              <input class="cf-input" type="text" id="cf-patient-name" placeholder="Auto-generated">
+            </div>
+            <div>
+              <label class="cf-label">Container / Tube Observed by Student</label>
+              <input class="cf-input" type="text" id="cf-container" placeholder="e.g. ESwab (Amies transport medium)">
+            </div>
+          </div>
+
+          <div class="case-form-grid">
+            <div>
+              <label class="cf-label">Transport Condition Observed</label>
+              <input class="cf-input" type="text" id="cf-transport" placeholder="e.g. Refrigerated (2–8°C)">
+            </div>
+            <div>
+              <label class="cf-label">Specimen Notes / Appearance</label>
+              <input class="cf-input" type="text" id="cf-notes" placeholder="e.g. Small purulent wound swab, adequate quantity">
+            </div>
+          </div>
+
+          <div style="margin-bottom:14px">
+            <div class="modal-section-title" style="margin-bottom:10px">Errors Present — select ALL that should be flagged as rejection reasons</div>
+            <div class="errors-cat">
+              <div class="errors-cat-title">Label Issues</div>
+              <div class="errors-grid">
+                <div class="error-check"><input type="checkbox" id="ce-label_no_name"><label for="ce-label_no_name">Missing patient name on label</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-label_no_identifier"><label for="ce-label_no_identifier">Missing unique identifier on label</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-label_no_date"><label for="ce-label_no_date">Missing collection date on label</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-label_no_time"><label for="ce-label_no_time">Missing collection time on label</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-label_name_mismatch"><label for="ce-label_name_mismatch">Name mismatch (label ≠ req)</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-label_phn_mismatch"><label for="ce-label_phn_mismatch">PHN mismatch (label ≠ req)</label></div>
+              </div>
+            </div>
+            <div class="errors-cat">
+              <div class="errors-cat-title">Requisition Issues</div>
+              <div class="errors-grid">
+                <div class="error-check"><input type="checkbox" id="ce-req_no_name"><label for="ce-req_no_name">Missing patient name on req</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_dob"><label for="ce-req_no_dob">Missing DOB on req</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_phn"><label for="ce-req_no_phn">Missing PHN on req</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_tests"><label for="ce-req_no_tests">Missing tests requested</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_source"><label for="ce-req_no_source">Missing source of specimen</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_date"><label for="ce-req_no_date">Missing collection date on req</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-req_no_provider"><label for="ce-req_no_provider">Missing ordering provider</label></div>
+              </div>
+            </div>
+            <div class="errors-cat">
+              <div class="errors-cat-title">Specimen Suitability</div>
+              <div class="errors-grid">
+                <div class="error-check"><input type="checkbox" id="ce-specimen_wrong_container"><label for="ce-specimen_wrong_container">Incorrect container</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_insufficient"><label for="ce-specimen_insufficient">Insufficient quantity</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_transport_error"><label for="ce-specimen_transport_error">Transported incorrectly</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_inadequate_fixative"><label for="ce-specimen_inadequate_fixative">Inadequate fixative</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_too_large"><label for="ce-specimen_too_large">Specimen too large for container</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_stability_age"><label for="ce-specimen_stability_age">Stability compromised (age)</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_stability_temp"><label for="ce-specimen_stability_temp">Stability compromised (temperature)</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_leaking"><label for="ce-specimen_leaking">Leaking specimen</label></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:8px">
+            <button class="btn-save-case" onclick="saveCase()">Save Case</button>
+            <button class="btn-sm btn-sm-edit" style="padding:8px 16px" onclick="cancelCaseForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <div>
+          <button class="btn-add-case" onclick="showCaseForm(-1)">+ Add Case</button>
+          <span class="instr-save-note" style="margin-left:12px">Cases auto-save to this browser. Students on separate computers need this same file.</span>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn-clear-cases" onclick="clearAllCases()">Clear All Cases</button>
+          <button class="btn-primary" style="width:auto;padding:9px 22px" onclick="closeInstructor()">Done →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SCREEN: LOGIN
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-login" class="screen active">
+  <div class="login-card">
+    <div class="login-card-header">
+      <div class="login-logo-row">
+        <div class="login-logo-mark">SJMH</div>
+        <div>
+          <div class="login-hosp-name">Saint Jason Memorial Hospital</div>
+          <div class="login-hosp-sub">Department of Laboratory Medicine &amp; Pathology</div>
+        </div>
+      </div>
+      <div class="login-card-title">Specimen Accessioning — Simulation</div>
+      <div class="login-card-sub">Microbiology Department · LIS Training Module</div>
+    </div>
+    <div class="login-card-body">
+      <div class="form-field">
+        <label class="form-label" for="input-tech-id">Tech ID / Student Initials</label>
+        <input class="form-input" type="text" id="input-tech-id" placeholder="e.g. JDS or T2045" maxlength="12" autocomplete="off">
+      </div>
+      <div id="login-no-cases" class="alert-banner alert-warning hidden">
+        No simulation cases have been configured yet. Please ask your instructor to set up cases using the Instructor panel.
+      </div>
+      <div id="login-error" class="alert-banner alert-error hidden">Please enter your Tech ID or initials to continue.</div>
+      <button class="btn-primary" onclick="startSession()">Begin Simulation →</button>
+      <div class="alert-banner alert-info" style="margin-top:14px">
+        <strong>Simulation Mode:</strong> You are processing real simulated specimens. Review each requisition and specimen label carefully. No feedback is given during the session — your full results will be available at the end for export.
+      </div>
+      <div style="text-align:center;margin-top:16px">
+        <button class="btn-instructor-header" style="background:none;border:none;color:var(--text-muted);font-size:11px;cursor:pointer;text-decoration:underline" onclick="openInstructor()">Instructor Setup</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SCREEN: CASE REVIEW
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-case" class="screen">
+  <div class="sys-header">
+    <div class="header-left">
+      <span class="hosp-badge">SJMH</span>
+      <div>
+        <div class="header-sys-name">Saint Jason Memorial Hospital · Department of Laboratory Medicine</div>
+        <div class="header-title">MICROBIOLOGY · SPECIMEN ACCESSIONING</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="btn-instructor-header" onclick="openInstructor()">Instructor</button>
+      <span class="header-student">Tech ID: <strong id="header-student-id">—</strong></span>
+      <span class="header-clock" id="header-clock">00:00:00</span>
+    </div>
+  </div>
+
+  <div class="progress-bar-wrap">
+    <span class="progress-label">CASES</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+    <span class="progress-count" id="progress-count">0 / 0</span>
+  </div>
+
+  <div class="case-body">
+    <div class="case-requisition-col">
+      <div class="panel">
+        <div class="panel-header">
+          Microbiology Requisition
+          <span class="panel-header-tag" id="case-ref-tag">—</span>
+        </div>
+        <div id="req-form-content" class="req-form"></div>
+      </div>
+    </div>
+
+    <div class="case-right-col">
+      <div class="panel">
+        <div class="panel-header">Specimen Label</div>
+        <div class="label-area" id="label-area"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">Physical Specimen Observations</div>
+        <div class="specimen-details" id="specimen-details"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header" id="decision-panel-header">Accessioning Decision</div>
+        <div class="decision-panel">
+          <!-- Step 1: Accept / Reject -->
+          <div id="decision-step">
+            <div class="decision-question">Is this specimen acceptable for processing?</div>
+            <div class="decision-btns">
+              <button class="btn-accept" id="btn-accept" onclick="selectDecision('ACCEPT')">✓ ACCEPT</button>
+              <button class="btn-reject" id="btn-reject" onclick="selectDecision('REJECT')">✗ REJECT</button>
+            </div>
+            <div class="reasons-section" id="reasons-section">
+              <div class="reasons-label">Reason(s) for Rejection — select all that apply:</div>
+              <div class="reasons-category">
+                <div class="reasons-cat-title">Label Issues</div>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_name"><span class="reason-text">Missing patient name on specimen label</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_identifier"><span class="reason-text">Missing unique identifier (PHN or DOB) on specimen label</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_date"><span class="reason-text">Missing collection date on specimen label</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_time"><span class="reason-text">Missing collection time on specimen label</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_name_mismatch"><span class="reason-text">Patient name does not match between label and requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_phn_mismatch"><span class="reason-text">PHN does not match between label and requisition</span></label>
+              </div>
+              <div class="reasons-category">
+                <div class="reasons-cat-title">Requisition Issues</div>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_name"><span class="reason-text">Missing patient name on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_dob"><span class="reason-text">Missing date of birth on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_phn"><span class="reason-text">Missing PHN on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_tests"><span class="reason-text">Tests requested not specified on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_source"><span class="reason-text">Source of specimen not specified on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_date"><span class="reason-text">Missing collection date on requisition</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_provider"><span class="reason-text">Missing ordering provider name on requisition</span></label>
+              </div>
+              <div class="reasons-category">
+                <div class="reasons-cat-title">Specimen Suitability</div>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_wrong_container"><span class="reason-text">Incorrect specimen collection container</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_insufficient"><span class="reason-text">Insufficient specimen quantity</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_transport_error"><span class="reason-text">Transported incorrectly</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_inadequate_fixative"><span class="reason-text">Inadequate fixative</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_too_large"><span class="reason-text">Specimen too large for container</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_stability_age"><span class="reason-text">Specimen stability compromised (age)</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_stability_temp"><span class="reason-text">Specimen stability compromised (temperature)</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_leaking"><span class="reason-text">Leaking specimen</span></label>
+              </div>
+            </div>
+            <button class="btn-submit-case" id="btn-submit" onclick="submitCase()" disabled>Submit &amp; Next Case</button>
+            <div class="no-feedback-notice">Simulation mode — feedback provided in final export only</div>
+          </div>
+          <!-- Step 2: Plating (shown after ACCEPT) -->
+          <div id="plating-step" style="display:none">
+            <div id="plating-grid"></div>
+            <div class="no-feedback-notice" style="margin-top:8px">Simulation mode — plating results in export only</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     SCREEN: SUMMARY
+     ══════════════════════════════════════════════════════════════════════ -->
+<div id="screen-summary" class="screen">
+  <div class="sys-header">
+    <div class="header-left">
+      <span class="hosp-badge">SJMH</span>
+      <div>
+        <div class="header-sys-name">Saint Jason Memorial Hospital · Department of Laboratory Medicine</div>
+        <div class="header-title">SIMULATION COMPLETE — SESSION SUMMARY</div>
+      </div>
+    </div>
+  </div>
+  <div class="summary-body">
+    <div class="summary-header-card" id="summary-header"></div>
+    <div class="summary-notice">
+      <div class="alert-banner alert-info">Results are shown below. Download your results as a CSV to submit to your instructor.</div>
+    </div>
+    <div class="summary-table-wrap">
+      <table class="summary-table">
+        <thead>
+          <tr>
+            <th>Case</th>
+            <th>Specimen Type</th>
+            <th>Correct Verdict</th>
+            <th>Your Decision</th>
+            <th>Accession Result</th>
+            <th>Missed Reasons</th>
+            <th>Extra Reasons</th>
+            <th>Plating Result</th>
+            <th>Missed Plates</th>
+            <th>Extra Plates</th>
+          </tr>
+        </thead>
+        <tbody id="summary-tbody"></tbody>
+      </table>
+    </div>
+    <div class="summary-actions">
+      <button class="btn-export" onclick="exportCSV()">⬇ Download Results (CSV)</button>
+      <button class="btn-new-session" onclick="resetSession()">New Student Session</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     JAVASCRIPT
+     ══════════════════════════════════════════════════════════════════════ -->
+<script>
+'use strict';
+
+/* ── CONSTANTS ───────────────────────────────────────────────────────── */
+const INSTR_PASSWORD = 'CNC-2026'; // Change this in settings below
+
+/* ── DATA ────────────────────────────────────────────────────────────── */
+const FIRST_NAMES = ['Emma','Liam','Olivia','Noah','Ava','William','Sophia','James','Isabella','Oliver',
+  'Charlotte','Benjamin','Amelia','Lucas','Mia','Mason','Harper','Ethan','Evelyn','Aiden',
+  'Abigail','Logan','Emily','Alexander','Elizabeth','Elijah','Mila','Jacob','Ella','Michael',
+  'Avery','Daniel','Sofia','Henry','Camila','Jackson','Aria','Sebastian','Scarlett','Jack',
+  'Victoria','Owen','Chloe','Samuel','Penelope','Wyatt','Riley','John','Nora','David'];
+const LAST_NAMES = ['Smith','Johnson','Williams','Brown','Jones','Garcia','Miller','Davis','Wilson',
+  'Anderson','Taylor','Thomas','Hernandez','Moore','Martin','Jackson','Thompson','White','Lopez',
+  'Lee','Harris','Clark','Lewis','Robinson','Walker','Perez','Hall','Young','Allen','Sanchez'];
+const PHYSICIANS = ['Dr. Sarah Patel','Dr. Michael Chen','Dr. James Anderson','Dr. Patricia Williams',
+  'Dr. Robert Thompson','Dr. Lisa Johnson','Dr. David Kim','Dr. Emily Rodriguez','Dr. Kevin Singh'];
+
+const SPEC_DEFAULTS = {
+  'Urine':               { source: 'Voided Urine — Clean Catch Midstream', test: 'Urine C&S', container: 'Sterile urine container (white lid)', transport: 'Refrigerated (2–8°C)' },
+  'Blood Culture':       { source: 'Peripheral Blood — Right Antecubital', test: 'Blood Culture × 2 sets', container: 'Blood culture bottles (aerobic + anaerobic)', transport: 'Room temperature (20–25°C)' },
+  'Wound Swab':          { source: 'Wound — Left Lower Extremity', test: 'Wound C&S', container: 'ESwab (liquid Amies transport medium)', transport: 'Room temperature (20–25°C)' },
+  'Sputum':              { source: 'Sputum — Expectorated', test: 'Sputum C&S', container: 'Sterile sputum cup (wide-mouth)', transport: 'Refrigerated (2–8°C)' },
+  'Stool':               { source: 'Stool — Random', test: 'Stool Culture', container: 'Cary-Blair transport medium', transport: 'Refrigerated (2–8°C)' },
+  'Throat Swab':         { source: 'Throat — Posterior Pharynx', test: 'Group A Streptococcus Screen', container: 'ESwab (Amies transport medium)', transport: 'Refrigerated (2–8°C)' },
+  'Nasopharyngeal Swab': { source: 'Nasopharynx', test: 'Respiratory Viral Panel (PCR)', container: 'Viral Transport Medium (VTM)', transport: 'Refrigerated (2–8°C)' },
+  'CSF':                 { source: 'CSF — Lumbar Puncture (Tube 2)', test: 'CSF Gram Stain + Culture', container: 'Sterile numbered CSF tube', transport: 'Room temperature — STAT' },
+  'Tissue':              { source: 'Wound Tissue — Debridement', test: 'Tissue Culture', container: 'Sterile container with sterile saline', transport: 'Room temperature (20–25°C)' },
+};
+
+const ERROR_META = {
+  label_no_name:          { cat: 'label',    desc: 'Missing patient name on specimen label' },
+  label_no_identifier:    { cat: 'label',    desc: 'Missing unique identifier (PHN or DOB) on specimen label' },
+  label_no_date:          { cat: 'label',    desc: 'Missing collection date on specimen label' },
+  label_no_time:          { cat: 'label',    desc: 'Missing collection time on specimen label' },
+  label_name_mismatch:    { cat: 'label',    desc: 'Patient name does not match between label and requisition' },
+  label_phn_mismatch:     { cat: 'label',    desc: 'PHN does not match between label and requisition' },
+  req_no_name:            { cat: 'req',      desc: 'Missing patient name on requisition' },
+  req_no_dob:             { cat: 'req',      desc: 'Missing date of birth on requisition' },
+  req_no_phn:             { cat: 'req',      desc: 'Missing PHN on requisition' },
+  req_no_tests:           { cat: 'req',      desc: 'Tests requested not specified on requisition' },
+  req_no_source:          { cat: 'req',      desc: 'Source of specimen not specified on requisition' },
+  req_no_date:            { cat: 'req',      desc: 'Missing collection date on requisition' },
+  req_no_provider:        { cat: 'req',      desc: 'Missing ordering provider name on requisition' },
+  specimen_wrong_container:    { cat: 'specimen', desc: 'Incorrect specimen collection container' },
+  specimen_insufficient:       { cat: 'specimen', desc: 'Insufficient specimen quantity' },
+  specimen_transport_error:    { cat: 'specimen', desc: 'Transported incorrectly' },
+  specimen_inadequate_fixative:{ cat: 'specimen', desc: 'Inadequate fixative' },
+  specimen_too_large:          { cat: 'specimen', desc: 'Specimen too large for container' },
+  specimen_stability_age:      { cat: 'specimen', desc: 'Specimen stability compromised (age)' },
+  specimen_stability_temp:     { cat: 'specimen', desc: 'Specimen stability compromised (temperature)' },
+  specimen_leaking:            { cat: 'specimen', desc: 'Leaking specimen' },
+};
+
+/* ── EQUIVALENT ERROR GROUPS (for scoring) ───────────────────────────── */
+const EQUIVALENT_GROUPS = [
+  ['specimen_transport_error', 'specimen_stability_temp'],
+  ['specimen_wrong_container', 'specimen_inadequate_fixative'],
+];
+function getEquivalents(key) {
+  for (const g of EQUIVALENT_GROUPS) { if (g.includes(key)) return g; }
+  return [key];
+}
+
+/* ── PLATING DATA ────────────────────────────────────────────────────── */
+const MEDIA_GROUPS = [
+  { name: 'Stains',               items: [{ val:'GM',           label:'<span class="plate-abbr">GM</span> — Gram Stain' }] },
+  { name: 'Aerobic / CO₂ Plates', items: [
+    { val:'BAP CO2', label:'<span class="plate-abbr">BAP CO₂</span> — Blood Agar Plate (CO₂)' },
+    { val:'BAP O2',  label:'<span class="plate-abbr">BAP O₂</span> — Blood Agar Plate (O₂/aerobic)' },
+    { val:'CAP CO2', label:'<span class="plate-abbr">CAP CO₂</span> — Chocolate Agar Plate (CO₂)' },
+    { val:'MAC O2',  label:'<span class="plate-abbr">MAC</span> — MacConkey Agar (O₂)' },
+    { val:'CLED O2', label:'<span class="plate-abbr">CLED</span> — CLED Agar (O₂)' },
+  ]},
+  { name: 'Anaerobic Plates', items: [
+    { val:'BAP ANA', label:'<span class="plate-abbr">BAP ANA</span> — Blood Agar Plate (Anaerobic)' },
+    { val:'BBE AnA', label:'<span class="plate-abbr">BBE</span> — Bacteroides Bile Esculin (Anaerobic)' },
+    { val:'PEA AnA', label:'<span class="plate-abbr">PEA</span> — Phenylethyl Alcohol Agar (Anaerobic)' },
+  ]},
+  { name: 'Selective / Specialty', items: [
+    { val:'TM CO2',         label:'<span class="plate-abbr">TM CO₂</span> — Thayer-Martin (CO₂)' },
+    { val:'GBS',            label:'<span class="plate-abbr">GBS</span> — Granada / GBS Agar' },
+    { val:'MRSA select O2', label:'<span class="plate-abbr">MRSA sel</span> — MRSA Selective Agar (O₂)' },
+    { val:'SAB',            label:'<span class="plate-abbr">SAB</span> — Sabouraud Dextrose Agar' },
+  ]},
+  { name: 'Enteric Selective', items: [
+    { val:'SMAC O2',      label:'<span class="plate-abbr">SMAC</span> — Sorbitol MacConkey (O₂)' },
+    { val:'XLD O2',       label:'<span class="plate-abbr">XLD</span> — Xylose Lysine Deoxycholate (O₂)' },
+    { val:'HE O2',        label:'<span class="plate-abbr">HE</span> — Hektoen Enteric (O₂)' },
+    { val:'CINO2 30°',    label:'<span class="plate-abbr">CIN 30°</span> — CIN Agar (O₂, 30°C)' },
+    { val:'CAMP mO2 42°', label:'<span class="plate-abbr">CAMP 42°</span> — CAMP mO₂ (42°C)' },
+  ]},
+  { name: 'Broths', items: [
+    { val:'THIO', label:'<span class="plate-abbr">THIO</span> — Thioglycollate Broth' },
+  ]},
+];
+
+function getPlatingSpec(specType, source) {
+  const s = source || '';
+  switch (specType) {
+    case 'Urine':
+      if (s.toLowerCase().includes('suprapubic'))
+        return { required:['GM','BAP CO2','CAP CO2','MAC O2'], conditional:[], skip:false,
+                 notes:'Suprapubic aspirate — full set including Gram stain' };
+      return { required:['BAP O2','MAC O2'], conditional:[], skip:false,
+               notes:'Standard urine culture — BAP O₂ + MAC' };
+    case 'Blood Culture':
+      return { skip:true, message:'Blood cultures are loaded directly into the BACTEC incubator — no conventional agar plating at accessioning.' };
+    case 'Wound Swab':
+      return { required:['GM','BAP CO2','MAC O2'], conditional:[], skip:false,
+               notes:'Surface wound — GM + BAP CO₂ + MAC' };
+    case 'Sputum':
+      return { required:['GM','BAP CO2','CAP CO2','MAC O2'], conditional:[], skip:false,
+               notes:'Gram stain performed first (quantitative) to assess specimen quality' };
+    case 'Stool':
+      return { required:['BAP O2','MAC O2','SMAC O2','XLD O2','HE O2','CINO2 30°','CAMP mO2 42°'], conditional:[], skip:false,
+               notes:'Enteric pathogen panel' };
+    case 'Throat Swab':
+      return { required:['BAP ANA'], conditional:[], skip:false,
+               notes:'Throat culture — anaerobic BAP only' };
+    case 'Nasopharyngeal Swab':
+      return { skip:true, message:'NP swabs for respiratory viral/PCR panels are forwarded to Virology/Molecular — no conventional agar plating.' };
+    case 'CSF':
+      return { required:['GM','BAP CO2','CAP CO2','MAC O2','THIO'], conditional:[], skip:false,
+               notes:'STAT — Gram stain performed immediately on receipt' };
+    case 'Tissue':
+      return { required:['GM','BAP CO2','CAP CO2','MAC O2','BAP ANA','THIO'], conditional:['BBE AnA','PEA AnA'], skip:false,
+               notes:'BBE AnA if abdominal source; PEA AnA if β-haemolysis on Gram stain' };
+    default:
+      return { required:['BAP CO2','MAC O2'], conditional:[], skip:false, notes:'' };
+  }
+}
+
+/* ── HELPERS ─────────────────────────────────────────────────────────── */
+function rand(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function padTwo(n) { return String(n).padStart(2, '0'); }
+function genPHN() {
+  const d = () => Math.floor(Math.random() * 10);
+  return `${Math.floor(Math.random()*9)+1}${d()}${d()}${d()}-${d()}${d()}${d()}-${d()}${d()}${d()}`;
+}
+function genDOB() {
+  const y = 1945 + Math.floor(Math.random() * 60);
+  const m = 1 + Math.floor(Math.random() * 12);
+  const day = 1 + Math.floor(Math.random() * 28);
+  return `${y}-${padTwo(m)}-${padTwo(day)}`;
+}
+function nowStr() {
+  const d = new Date();
+  return { date: `${d.getFullYear()}-${padTwo(d.getMonth()+1)}-${padTwo(d.getDate())}`, time: `${padTwo(d.getHours())}:${padTwo(d.getMinutes())}` };
+}
+function reqNum() { return `REQ-${Math.floor(Math.random()*90000)+10000}`; }
+
+/* ── INSTRUCTOR CASE STORAGE ─────────────────────────────────────────── */
+const STORAGE_KEY = 'sjmh_sim_cases';
+
+function loadCases() {
+  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch { return []; }
+}
+function saveCasesDB(cases) { localStorage.setItem(STORAGE_KEY, JSON.stringify(cases)); }
+
+/* ── INSTRUCTOR AUTH ─────────────────────────────────────────────────── */
+let instrAuthed = false;
+let editingCaseIndex = -1;
+
+function openInstructor() {
+  document.getElementById('modal-instructor').classList.remove('hidden');
+  if (instrAuthed) {
+    showInstrEditor();
+  } else {
+    document.getElementById('instr-pw-screen').style.display = '';
+    document.getElementById('instr-editor-screen').classList.add('hidden');
+  }
+}
+function closeInstructor() {
+  document.getElementById('modal-instructor').classList.add('hidden');
+  document.getElementById('instr-pw-input').value = '';
+  document.getElementById('instr-pw-error').classList.add('hidden');
+}
+function checkInstrPw() {
+  const pw = document.getElementById('instr-pw-input').value;
+  if (pw === INSTR_PASSWORD) {
+    instrAuthed = true;
+    showInstrEditor();
+    document.getElementById('instr-pw-error').classList.add('hidden');
+  } else {
+    document.getElementById('instr-pw-error').classList.remove('hidden');
+  }
+}
+function showInstrEditor() {
+  document.getElementById('instr-pw-screen').style.display = 'none';
+  document.getElementById('instr-editor-screen').classList.remove('hidden');
+  renderCaseList();
+}
+
+/* ── CASE LIST UI ────────────────────────────────────────────────────── */
+function renderCaseList() {
+  const cases = loadCases();
+  document.getElementById('case-count-label').textContent = cases.length;
+  const wrap = document.getElementById('case-list-wrap');
+  if (cases.length === 0) {
+    wrap.innerHTML = '<p style="font-size:13px;color:var(--text-muted);padding:12px 0">No cases configured yet. Click "Add Case" to begin.</p>';
+    return;
+  }
+  wrap.innerHTML = cases.map((c, i) => {
+    const errorCount = c.errors.length;
+    const verdict = errorCount > 0 ? 'REJECT' : 'ACCEPT';
+    return `
+      <div class="case-card">
+        <div class="case-card-header" onclick="toggleCaseCard(${i})">
+          <div>
+            <span class="case-card-num">${c.label || `Case ${i+1}`}</span>
+            <span class="case-card-summary" style="margin-left:10px">${c.specType || '—'} · ${verdict} · ${errorCount} error${errorCount !== 1 ? 's' : ''}</span>
+          </div>
+          <div class="case-card-actions" onclick="event.stopPropagation()">
+            <button class="btn-sm btn-sm-edit" onclick="showCaseForm(${i})">Edit</button>
+            <button class="btn-sm btn-sm-del" onclick="deleteCase(${i})">Delete</button>
+          </div>
+        </div>
+        <div class="case-card-body collapsed" id="case-card-body-${i}">
+          <div style="font-size:12px;color:var(--text-secondary)">
+            <strong>Errors:</strong> ${errorCount === 0 ? 'None (acceptable)' : c.errors.map(e => ERROR_META[e]?.desc || e).join('; ')}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function toggleCaseCard(i) {
+  const body = document.getElementById(`case-card-body-${i}`);
+  body.classList.toggle('collapsed');
+}
+
+function showCaseForm(index) {
+  editingCaseIndex = index;
+  const cases = loadCases();
+  const c = index >= 0 ? cases[index] : null;
+
+  document.getElementById('case-form-title').textContent = index >= 0 ? `Edit Case ${index + 1}` : 'Add New Case';
+  document.getElementById('cf-label').value       = c?.label || '';
+  document.getElementById('cf-spec-type').value   = c?.specType || '';
+  document.getElementById('cf-patient-name').value= c?.patientName || '';
+  document.getElementById('cf-container').value   = c?.container || '';
+  document.getElementById('cf-transport').value   = c?.transport || '';
+  document.getElementById('cf-notes').value       = c?.notes || '';
+
+  // Reset all error checkboxes
+  Object.keys(ERROR_META).forEach(key => {
+    const el = document.getElementById(`ce-${key}`);
+    if (el) el.checked = c?.errors?.includes(key) || false;
+  });
+
+  document.getElementById('case-form-panel').classList.remove('hidden');
+  document.getElementById('case-form-panel').scrollIntoView({ behavior: 'smooth' });
+}
+
+function cancelCaseForm() {
+  document.getElementById('case-form-panel').classList.add('hidden');
+  editingCaseIndex = -1;
+}
+
+function saveCase() {
+  const label    = document.getElementById('cf-label').value.trim() || `Case ${loadCases().length + 1}`;
+  const specType = document.getElementById('cf-spec-type').value;
+  const patientName = document.getElementById('cf-patient-name').value.trim();
+  const container   = document.getElementById('cf-container').value.trim();
+  const transport   = document.getElementById('cf-transport').value.trim();
+  const notes       = document.getElementById('cf-notes').value.trim();
+
+  const errors = Object.keys(ERROR_META).filter(key => {
+    const el = document.getElementById(`ce-${key}`);
+    return el?.checked;
+  });
+
+  const caseData = { label, specType, patientName, container, transport, notes, errors };
+  const cases = loadCases();
+
+  if (editingCaseIndex >= 0) {
+    cases[editingCaseIndex] = caseData;
+  } else {
+    cases.push(caseData);
+  }
+  saveCasesDB(cases);
+  cancelCaseForm();
+  renderCaseList();
+}
+
+function deleteCase(index) {
+  if (!confirm('Delete this case?')) return;
+  const cases = loadCases();
+  cases.splice(index, 1);
+  saveCasesDB(cases);
+  renderCaseList();
+}
+
+function clearAllCases() {
+  if (!confirm('Clear ALL configured cases? This cannot be undone.')) return;
+  saveCasesDB([]);
+  renderCaseList();
+}
+
+/* ── BUILD RENDERABLE CASE FROM CONFIG ───────────────────────────────── */
+function buildRenderableCase(cfg, idx) {
+  const now = nowStr();
+  const specType = cfg.specType || 'Urine';
+  const defaults = SPEC_DEFAULTS[specType] || SPEC_DEFAULTS['Urine'];
+  const errors = cfg.errors || [];
+
+  // Patient details
+  const firstName = (cfg.patientName ? cfg.patientName.split(' ')[0] : rand(FIRST_NAMES));
+  const lastName  = (cfg.patientName ? cfg.patientName.split(' ').slice(1).join(' ') : rand(LAST_NAMES));
+  const fullName  = cfg.patientName || `${firstName} ${lastName}`;
+  const dob = genDOB();
+  const phn = genPHN();
+  const physician = rand(PHYSICIANS);
+
+  // Label fields with errors applied
+  let labelName = fullName, labelPHN = phn, labelDate = now.date, labelTime = now.time;
+  if (errors.includes('label_no_name'))       labelName = '';
+  if (errors.includes('label_no_identifier')) labelPHN  = '';
+  if (errors.includes('label_no_date'))       labelDate = '';
+  if (errors.includes('label_no_time'))       labelTime = '';
+  if (errors.includes('label_name_mismatch')) labelName = rand(FIRST_NAMES) + ' ' + rand(LAST_NAMES);
+  if (errors.includes('label_phn_mismatch'))  labelPHN  = genPHN();
+
+  if (errors.includes('specimen_stability_age')) {
+    labelDate = `${new Date().getFullYear()-1}-${padTwo(Math.floor(Math.random()*12)+1)}-${padTwo(Math.floor(Math.random()*28)+1)}`;
+    labelTime = '08:00';
+  }
+
+  const label = { name: labelName, identifier: labelPHN, date: labelDate, time: labelTime };
+
+  const req = {
+    name:     errors.includes('req_no_name')     ? '' : fullName,
+    dob:      errors.includes('req_no_dob')      ? '' : dob,
+    phn:      errors.includes('req_no_phn')      ? '' : phn,
+    tests:    errors.includes('req_no_tests')    ? '' : defaults.test,
+    source:   errors.includes('req_no_source')   ? '' : defaults.source,
+    date:     errors.includes('req_no_date')     ? '' : now.date,
+    provider: errors.includes('req_no_provider') ? '' : physician,
+  };
+
+  const container = cfg.container || defaults.container;
+  const transport = cfg.transport || defaults.transport;
+  const notes     = cfg.notes || '';
+
+  return {
+    num: idx + 1,
+    reqNum: reqNum(),
+    caseLabel: cfg.label,
+    spec: { type: specType },
+    label, req,
+    container, transport,
+    qty: notes || `${specType} — see physical specimen`,
+    specNotes: errors.includes('specimen_leaking') ? 'Visible leakage noted on exterior of container.' : '',
+    errors,
+    verdict: errors.length === 0 ? 'ACCEPT' : 'REJECT',
+    correctReasons: errors.map(e => ERROR_META[e]?.desc).filter(Boolean),
+    source: defaults.source,
+    flagNotes: '',
+  };
+}
+
+/* ── SESSION STATE ───────────────────────────────────────────────────── */
+const state = { studentId: '', cases: [], results: [], currentIndex: 0, decision: null, sessionStart: null, clockInterval: null };
+
+function padTwo2(n) { return String(n).padStart(2,'0'); }
+function startClock() {
+  state.sessionStart = Date.now();
+  state.clockInterval = setInterval(() => {
+    const s = Math.floor((Date.now() - state.sessionStart) / 1000);
+    const h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+    document.getElementById('header-clock').textContent = `${padTwo2(h)}:${padTwo2(m)}:${padTwo2(sec)}`;
+  }, 1000);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function startSession() {
+  const id = document.getElementById('input-tech-id').value.trim().toUpperCase();
+  const cfgCases = loadCases();
+  if (!id) { document.getElementById('login-error').classList.remove('hidden'); return; }
+  if (cfgCases.length === 0) { document.getElementById('login-no-cases').classList.remove('hidden'); return; }
+
+  state.studentId = id;
+  state.cases = cfgCases.map((c, i) => buildRenderableCase(c, i));
+  state.results = [];
+  state.currentIndex = 0;
+  document.getElementById('header-student-id').textContent = id;
+  showScreen('screen-case');
+  startClock();
+  renderCase();
+}
+
+/* ── RENDER CASE ─────────────────────────────────────────────────────── */
+function renderCase() {
+  const c = state.cases[state.currentIndex];
+  const total = state.cases.length;
+  const idx = state.currentIndex;
+
+  document.getElementById('progress-fill').style.width = `${(idx / total) * 100}%`;
+  document.getElementById('progress-count').textContent = `${idx} / ${total}`;
+  document.getElementById('case-ref-tag').textContent = `${c.caseLabel || c.reqNum}`;
+
+  state.decision = null;
+  state.pendingDecision = null;
+  document.getElementById('btn-accept').classList.remove('selected');
+  document.getElementById('btn-reject').classList.remove('selected');
+  document.getElementById('reasons-section').classList.remove('visible');
+  document.getElementById('btn-submit').disabled = true;
+  document.querySelectorAll('.reason-cb').forEach(cb => cb.checked = false);
+  document.getElementById('decision-step').style.display = '';
+  document.getElementById('plating-step').style.display = 'none';
+  document.getElementById('decision-panel-header').textContent = 'Accessioning Decision';
+
+  document.getElementById('req-form-content').innerHTML = renderReqForm(c);
+  document.getElementById('label-area').innerHTML        = renderLabel(c);
+  document.getElementById('specimen-details').innerHTML  = renderSpecimenDetails(c);
+}
+
+function rot() { return `transform:rotate(${(Math.random()*1.2-0.6).toFixed(2)}deg);display:inline-block`; }
+function hw(val) {
+  return val
+    ? `<span class="req-field-value" style="${rot()}">${val}</span>`
+    : `<span class="req-field-value" style="color:transparent">___</span>`;
+}
+
+function renderReqForm(c) {
+  const R = c.req;
+  return `
+    <div class="req-form-top">
+      <div>
+        <div class="req-lab-name">Saint Jason Memorial Hospital</div>
+        <div class="req-lab-sub">Department of Laboratory Medicine &amp; Pathology · Microbiology</div>
+      </div>
+      <div>
+        <div class="req-form-title">MICROBIOLOGY REQUISITION</div>
+        <div class="req-ref">${c.reqNum}</div>
+      </div>
+    </div>
+    <div class="req-section">
+      <div class="req-section-title">Patient Information</div>
+      <div class="req-grid req-grid-2" style="margin-bottom:6px">
+        <div class="req-field"><div class="req-field-label">Patient Full Name</div><div class="req-field-line">${hw(R.name)}</div></div>
+        <div class="req-field"><div class="req-field-label">Date of Birth (YYYY-MM-DD)</div><div class="req-field-line">${hw(R.dob)}</div></div>
+      </div>
+      <div class="req-grid req-grid-2">
+        <div class="req-field"><div class="req-field-label">PHN (Personal Health Number)</div><div class="req-field-line">${hw(R.phn)}</div></div>
+        <div class="req-field"><div class="req-field-label">Ordering Physician</div><div class="req-field-line">${hw(R.provider)}</div></div>
+      </div>
+    </div>
+    <div class="req-section">
+      <div class="req-section-title">Specimen Information</div>
+      <div class="req-grid req-grid-3">
+        <div class="req-field"><div class="req-field-label">Source of Specimen</div><div class="req-field-line">${hw(R.source)}</div></div>
+        <div class="req-field"><div class="req-field-label">Date of Collection</div><div class="req-field-line">${hw(R.date)}</div></div>
+        <div class="req-field"><div class="req-field-label">Specimen Type</div><div class="req-field-line">${hw(c.spec.type)}</div></div>
+      </div>
+    </div>
+    <div class="req-section">
+      <div class="req-section-title">Tests Requested</div>
+      <div class="req-notes-line">${R.tests ? `<span class="req-test-written" style="${rot()}">${R.tests}</span>` : ''}</div>
+    </div>
+    <div class="req-footer"><span>Form MBR-2 Rev.3</span><span>Saint Jason Memorial Hospital · Laboratory Medicine</span></div>
+  `;
+}
+
+function renderLabel(c) {
+  const L = c.label;
+  const lhw = val => val
+    ? `<span class="label-val" style="${rot()}">${val}</span>`
+    : `<span class="label-val missing">____</span>`;
+  return `
+    <div class="specimen-label">
+      <div class="label-body">
+        <div class="label-row">
+          <span class="label-key">Patient</span>${lhw(L.name)}
+          <span class="label-spec-type">${c.spec.type.toUpperCase()}</span>
+        </div>
+        <div class="label-row"><span class="label-key">PHN/ID</span>${lhw(L.identifier)}</div>
+        <div class="label-row"><span class="label-key">Date</span>${lhw(L.date)}</div>
+        <div class="label-row"><span class="label-key">Time</span>${lhw(L.time)}</div>
+      </div>
+    </div>`;
+}
+
+function renderSpecimenDetails(c) {
+  const wrongCont = c.errors.includes('specimen_wrong_container');
+  const wrongTransp = c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp');
+  const insuff = c.errors.includes('specimen_insufficient');
+  return `
+    <div class="spec-detail-row">
+      <span class="spec-detail-key">Container Observed</span>
+      <span class="spec-detail-val ${wrongCont ? 'flag' : ''}">${c.container}</span>
+    </div><hr class="spec-divider">
+    <div class="spec-detail-row">
+      <span class="spec-detail-key">Transport Condition</span>
+      <span class="spec-detail-val ${wrongTransp ? 'flag' : ''}">${c.transport}</span>
+    </div><hr class="spec-divider">
+    <div class="spec-detail-row">
+      <span class="spec-detail-key">Quantity / Appearance</span>
+      <span class="spec-detail-val ${insuff ? 'flag' : ''}">${c.qty}</span>
+    </div>
+    ${c.specNotes ? `<hr class="spec-divider"><div class="spec-detail-row"><span class="spec-detail-key">Notes</span><span class="spec-detail-val flag">${c.specNotes}</span></div>` : ''}
+  `;
+}
+
+/* ── DECISION ────────────────────────────────────────────────────────── */
+function selectDecision(d) {
+  state.decision = d;
+  document.getElementById('btn-accept').classList.toggle('selected', d === 'ACCEPT');
+  document.getElementById('btn-reject').classList.toggle('selected', d === 'REJECT');
+  document.getElementById('reasons-section').classList.toggle('visible', d === 'REJECT');
+  document.getElementById('btn-submit').disabled = false;
+}
+
+function submitCase() {
+  const c = state.cases[state.currentIndex];
+  const studentDecision = state.decision;
+  const studentReasons = studentDecision === 'REJECT'
+    ? [...document.querySelectorAll('.reason-cb:checked')].map(cb => cb.value)
+    : [];
+
+  const correct = c.errors;
+  const decisionCorrect = studentDecision === c.verdict;
+  const missed = correct.filter(e => !getEquivalents(e).some(eq => studentReasons.includes(eq)));
+  const extra  = studentReasons.filter(r => !getEquivalents(r).some(eq => correct.includes(eq)));
+  const score  = !decisionCorrect ? 'incorrect' : (missed.length === 0 && extra.length === 0 ? 'correct' : 'partial');
+
+  state.pendingDecision = { studentDecision, studentReasons, correct, missed, extra, score };
+
+  if (studentDecision === 'ACCEPT') {
+    showPlatingStep(c);
+  } else {
+    finaliseCase(c, null);
+  }
+}
+
+function showPlatingStep(c) {
+  const plating = getPlatingSpec(c.spec.type, c.source);
+  document.getElementById('decision-step').style.display = 'none';
+  document.getElementById('decision-panel-header').textContent = 'Specimen Plating';
+  const step = document.getElementById('plating-step');
+  step.style.display = '';
+
+  if (plating.skip) {
+    document.getElementById('plating-grid').innerHTML = `
+      <div class="plating-skip-msg">ℹ️ <strong>${c.spec.type}:</strong> ${plating.message}</div>
+      <button class="btn-confirm-skip" onclick="submitPlating(true)">Confirm &amp; Next Case →</button>`;
+    return;
+  }
+
+  const groupsHTML = MEDIA_GROUPS.map(g => `
+    <div class="plating-group">
+      <div class="plating-group-title">${g.name}</div>
+      ${g.items.map(m => `
+        <label class="plating-item">
+          <input type="checkbox" class="plate-cb" value="${m.val}">
+          <span class="plate-label">${m.label}</span>
+        </label>`).join('')}
+    </div>`).join('');
+
+  document.getElementById('plating-grid').innerHTML = `
+    <div class="plating-step-header">✓ Accepted — select all media for this ${c.spec.type}:</div>
+    ${plating.notes ? `<div class="plating-note">Note: ${plating.notes}</div>` : ''}
+    ${groupsHTML}
+    <button class="btn-submit-plating" onclick="submitPlating(false)">Submit &amp; Next Case →</button>`;
+}
+
+function submitPlating(skipped) {
+  const c = state.cases[state.currentIndex];
+  const plating = getPlatingSpec(c.spec.type, c.source);
+  let platingResult = null;
+
+  if (!skipped && !plating.skip) {
+    const selected = [...document.querySelectorAll('.plate-cb:checked')].map(cb => cb.value);
+    const required = plating.required || [];
+    const conditional = plating.conditional || [];
+    const missedPlates = required.filter(p => !selected.includes(p));
+    const extraPlates  = selected.filter(p => !required.includes(p) && !conditional.includes(p));
+    const platingScore = missedPlates.length === 0 && extraPlates.length === 0 ? 'correct'
+                       : missedPlates.length === 0 ? 'partial' : 'incorrect';
+    platingResult = { selected, required, conditional, missedPlates, extraPlates, platingScore };
+  }
+
+  finaliseCase(c, platingResult);
+}
+
+function finaliseCase(c, platingResult) {
+  const { studentDecision, studentReasons, correct, missed, extra, score } = state.pendingDecision;
+
+  state.results.push({
+    caseNum: c.num, caseLabel: c.caseLabel || c.reqNum, specType: c.spec.type,
+    correctVerdict: c.verdict, studentDecision, correctReasons: correct,
+    studentReasons, missedReasons: missed, extraReasons: extra, score, platingResult,
+  });
+
+  state.currentIndex++;
+  if (state.currentIndex >= state.cases.length) {
+    if (state.clockInterval) clearInterval(state.clockInterval);
+    renderSummary();
+    showScreen('screen-summary');
+  } else {
+    renderCase();
+  }
+}
+
+/* ── SUMMARY ─────────────────────────────────────────────────────────── */
+function renderSummary() {
+  const results = state.results;
+  const total = results.length;
+  const correct = results.filter(r => r.score === 'correct').length;
+
+  document.getElementById('summary-header').innerHTML = `
+    <div>
+      <div class="summary-student">Student: <strong>${state.studentId}</strong></div>
+      <div class="summary-student" style="margin-top:4px">Completed: ${new Date().toLocaleString('en-CA')}</div>
+    </div>
+    <div><span class="summary-badge">${correct} / ${total} Fully Correct</span></div>`;
+
+  document.getElementById('summary-tbody').innerHTML = results.map(r => {
+    const missed = r.missedReasons.map(e => ERROR_META[e]?.desc || e).join('; ') || '—';
+    const extra  = r.extraReasons.map(e => ERROR_META[e]?.desc || e).join('; ') || '—';
+    const scoreColour = { correct:'color:var(--accept)', incorrect:'color:var(--reject)', partial:'color:#E65100' };
+    const pr = r.platingResult;
+    const ps = pr ? pr.platingScore : (r.studentDecision === 'ACCEPT' ? 'n/a' : '—');
+    const psColour = { correct:'color:var(--accept)', partial:'color:#E65100', incorrect:'color:var(--reject)', 'n/a':'color:var(--text-muted)', '—':'' };
+    const missedPl = pr ? pr.missedPlates.join(', ') || '—' : '—';
+    const extraPl  = pr ? pr.extraPlates.join(', ')  || '—' : '—';
+    return `<tr>
+      <td class="td-case">${r.caseLabel}</td>
+      <td>${r.specType}</td>
+      <td><span class="pill ${r.correctVerdict === 'ACCEPT' ? 'pill-accept' : 'pill-reject'}">${r.correctVerdict}</span></td>
+      <td><span class="pill ${r.studentDecision === 'ACCEPT' ? 'pill-accept' : 'pill-reject'}">${r.studentDecision}</span></td>
+      <td style="font-weight:600;${scoreColour[r.score]}">${r.score.charAt(0).toUpperCase()+r.score.slice(1)}</td>
+      <td style="font-size:11px">${missed}</td>
+      <td style="font-size:11px">${extra}</td>
+      <td style="font-size:11px;font-weight:600;${psColour[ps]}">${ps === 'n/a' ? 'N/A' : ps ? ps.charAt(0).toUpperCase()+ps.slice(1) : '—'}</td>
+      <td style="font-size:11px">${missedPl}</td>
+      <td style="font-size:11px">${extraPl}</td>
+    </tr>`;
+  }).join('');
+}
+
+function exportCSV() {
+  const rows = [['Tech ID','Case','Specimen Type','Correct Verdict','Student Decision','Accession Result','Missed Reasons','Extra Reasons','Plating Result','Correct Plates','Student Plates','Missed Plates','Extra Plates','Session Date']];
+  const date = new Date().toLocaleString('en-CA');
+  state.results.forEach(r => {
+    const pr = r.platingResult;
+    rows.push([
+      state.studentId,
+      r.caseLabel,
+      r.specType,
+      r.correctVerdict,
+      r.studentDecision,
+      r.score,
+      r.missedReasons.map(e => ERROR_META[e]?.desc || e).join(' | '),
+      r.extraReasons.map(e => ERROR_META[e]?.desc || e).join(' | '),
+      pr ? pr.platingScore : (r.studentDecision === 'ACCEPT' ? 'n/a' : '—'),
+      pr ? pr.required.join(' | ') : '—',
+      pr ? pr.selected.join(' | ') : '—',
+      pr ? pr.missedPlates.join(' | ') || '—' : '—',
+      pr ? pr.extraPlates.join(' | ')  || '—' : '—',
+      date,
+    ]);
+  });
+  const csv = rows.map(r => r.map(cell => `"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href = url;
+  a.download = `LIS-Simulation_${state.studentId}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function resetSession() {
+  if (state.clockInterval) clearInterval(state.clockInterval);
+  document.getElementById('input-tech-id').value = '';
+  document.getElementById('login-error').classList.add('hidden');
+  document.getElementById('login-no-cases').classList.add('hidden');
+  showScreen('screen-login');
+}
+</script>
+</body>
+</html>

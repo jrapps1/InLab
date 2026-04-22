@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LIS Training — Practice | CNC Health Sciences</title>
+  <title>LIS Training | CNC General Hospital Laboratory</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Indie+Flower&family=Kalam:wght@400;700&family=Patrick+Hand&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
@@ -35,6 +35,8 @@
       --sans: 'Inter', sans-serif;
       --hand: 'Caveat', cursive;
       --radius: 4px;
+      --manual-drawer-width: clamp(420px, 24vw, 500px);
+      --manual-reserve-gap: 18px;
     }
 
     *,
@@ -707,6 +709,12 @@
       background: var(--reject-light);
       border-top: 1px solid #FFCDD2;
       line-height: 1.4;
+    }
+
+    .obs-note-row.info {
+      color: #0F4C81;
+      background: #EFF6FF;
+      border-top-color: #BFDBFE;
     }
 
     /* ── DECISION PANEL ────────────────────────────────────────────────────── */
@@ -1596,6 +1604,384 @@
       color: #fff;
     }
 
+    .btn-header-link.btn-manual-toggle {
+      color: #D8E6F6;
+      border-color: rgba(216, 230, 246, 0.18);
+    }
+
+    .btn-header-link.btn-manual-toggle:hover,
+    .btn-header-link.btn-manual-toggle[aria-expanded="true"] {
+      background: rgba(21, 101, 192, 0.22);
+      color: #fff;
+      border-color: rgba(191, 219, 254, 0.45);
+    }
+
+    .alert-info {
+      background: #EFF6FF;
+      color: #0F4C81;
+      border: 1px solid #BFDBFE;
+    }
+
+    /* ── BENCH MANUAL ──────────────────────────────────────────────────────── */
+    body.manual-open {
+      overflow: hidden;
+    }
+
+    .manual-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 27, 42, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.22s ease;
+      z-index: 240;
+    }
+
+    .manual-overlay.open {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .manual-drawer {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(var(--manual-drawer-width), 94vw);
+      height: 100vh;
+      background: var(--surface);
+      border-left: 1px solid #D8DCE3;
+      box-shadow: -18px 0 40px rgba(13, 27, 42, 0.22);
+      transform: translateX(100%);
+      transition: transform 0.24s ease;
+      z-index: 250;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .manual-drawer.open {
+      transform: translateX(0);
+    }
+
+    .manual-header {
+      padding: 18px 20px 14px;
+      background: var(--sys-dark);
+      color: #fff;
+      border-bottom: 3px solid var(--cnc-red);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .manual-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .manual-subtitle {
+      font-size: 12px;
+      color: #A8BED4;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    .manual-close {
+      flex-shrink: 0;
+      padding: 7px 12px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #D8E6F6;
+      border: 1px solid rgba(216, 230, 246, 0.16);
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    .manual-close:hover {
+      background: rgba(255, 255, 255, 0.16);
+      color: #fff;
+    }
+
+    .manual-toolbar {
+      padding: 14px 20px 10px;
+      border-bottom: 1px solid #E5E7EB;
+      background: #F8FAFC;
+    }
+
+    .manual-search {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #CBD5E1;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: var(--sans);
+      color: var(--text-primary);
+      background: #fff;
+    }
+
+    .manual-search:focus {
+      outline: none;
+      border-color: var(--sys-accent);
+      box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.12);
+    }
+
+    .manual-body {
+      flex: 1;
+      overflow: auto;
+      padding: 14px 20px 22px;
+      background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%);
+    }
+
+    .manual-empty {
+      padding: 18px 20px 24px;
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .manual-section {
+      margin-bottom: 12px;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .manual-section summary,
+    .manual-entry summary {
+      list-style: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .manual-section summary::-webkit-details-marker,
+    .manual-entry summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .manual-section summary {
+      padding: 14px 16px;
+      background: #F8FAFC;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .manual-section summary::after,
+    .manual-entry summary::after {
+      content: '+';
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #E2E8F0;
+      color: #475569;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .manual-section[open] summary::after,
+    .manual-entry[open] summary::after {
+      content: '-';
+    }
+
+    .manual-section-body {
+      padding: 16px;
+      border-top: 1px solid #E5E7EB;
+    }
+
+    .manual-section-body p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    .manual-list {
+      padding-left: 18px;
+    }
+
+    .manual-list li {
+      margin-bottom: 7px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: var(--text-primary);
+    }
+
+    .manual-split {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .manual-mini-block {
+      background: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .manual-mini-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .manual-entry-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .manual-entry {
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .manual-entry summary {
+      padding: 12px 14px;
+      background: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .manual-entry-body {
+      padding: 14px;
+      border-top: 1px solid #E5E7EB;
+      background: #FCFDFE;
+    }
+
+    .manual-entry-title {
+      font-weight: 700;
+    }
+
+    .manual-entry-tag {
+      font-size: 11px;
+      font-weight: 600;
+      color: #0F4C81;
+      background: #EFF6FF;
+      border: 1px solid #BFDBFE;
+      border-radius: 999px;
+      padding: 3px 8px;
+      margin-left: auto;
+    }
+
+    .manual-card-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .manual-card {
+      background: #fff;
+      border: 1px solid #E2E8F0;
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .manual-card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .manual-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .manual-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: #F1F5F9;
+      color: #334155;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    .manual-subsection {
+      margin-top: 14px;
+    }
+
+    .manual-section-label {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .manual-note-box {
+      margin-top: 12px;
+      padding: 10px 12px;
+      background: #FFF8E1;
+      border: 1px solid #FDE68A;
+      border-radius: 8px;
+      font-size: 12px;
+      line-height: 1.55;
+      color: #7C5A00;
+    }
+
+    .manual-muted-copy {
+      font-size: 12px;
+      line-height: 1.5;
+      color: var(--text-muted);
+    }
+
+    .manual-variant+.manual-variant {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px dashed #D8DCE3;
+    }
+
+    .manual-variant-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 980px) {
+      .manual-drawer {
+        width: 100vw;
+      }
+
+      .manual-split,
+      .manual-card-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (min-width: 1600px) {
+      #screen-case .case-body {
+        width: min(1440px, calc(100vw - var(--manual-drawer-width) - var(--manual-reserve-gap) - 40px));
+        max-width: none;
+        margin-left: 20px;
+        margin-right: auto;
+        grid-template-columns: minmax(0, 1fr) clamp(300px, 18vw, 340px);
+        gap: 12px;
+      }
+    }
+
     .feedback-actions {
       display: flex;
       gap: 12px;
@@ -1667,8 +2053,8 @@
       <div class="header-left">
         <span class="cnc-badge">CNC</span>
         <div>
-          <div class="header-sys-name">College of New Caledonia — Health Sciences</div>
-          <div class="header-title">LIS TRAINING — MICROBIOLOGY ACCESSIONING</div>
+          <div class="header-sys-name">CNC General Hospital— Laboratory Services</div>
+          <div class="header-title">MICROBIOLOGY ACCESSIONING</div>
         </div>
       </div>
       <div class="header-right">
@@ -1725,12 +2111,14 @@
       <div class="header-left">
         <span class="cnc-badge">CNC</span>
         <div>
-          <div class="header-sys-name">College of New Caledonia — Health Sciences</div>
-          <div class="header-title">LIS TRAINING — PRACTICE MODULE</div>
+          <div class="header-sys-name">CNC General Hospital— Laboratory Services</div>
+          <div class="header-title">LIS — PRACTICE MODULE</div>
         </div>
       </div>
       <div class="header-right">
         <button class="btn-header-link" id="case-nav-btn" onclick="leaveCaseScreen()">← Worklist</button>
+        <button class="btn-header-link btn-manual-toggle" id="btn-bench-manual" type="button"
+          aria-controls="bench-manual" aria-expanded="false" onclick="toggleBenchManual()">Bench Manual</button>
         <span class="header-student">Tech ID: <strong id="header-student-id">—</strong></span>
         <span class="header-clock" id="header-clock">--:--:--</span>
       </div>
@@ -1860,8 +2248,8 @@
       <div class="header-left">
         <span class="cnc-badge">CNC</span>
         <div>
-          <div class="header-sys-name">College of New Caledonia — Health Sciences</div>
-          <div class="header-title">LIS TRAINING — CASE FEEDBACK</div>
+          <div class="header-sys-name">CNC General Hospital— Laboratory Services</div>
+          <div class="header-title">LIS — CASE FEEDBACK</div>
         </div>
       </div>
       <div class="header-right">
@@ -1888,8 +2276,8 @@
       <div class="header-left">
         <span class="cnc-badge">CNC</span>
         <div>
-          <div class="header-sys-name">College of New Caledonia — Health Sciences</div>
-          <div class="header-title">LIS TRAINING — SESSION SUMMARY</div>
+          <div class="header-sys-name">CNC General Hospital— Laboratory Services</div>
+          <div class="header-title">LIS — SESSION SUMMARY</div>
         </div>
       </div>
     </div>
@@ -1921,6 +2309,25 @@
       </div>
     </div>
   </div>
+
+  <div id="bench-manual-overlay" class="manual-overlay" onclick="closeBenchManual()"></div>
+  <aside id="bench-manual" class="manual-drawer" aria-hidden="true">
+    <div class="manual-header">
+      <div>
+        <div class="manual-title">Bench Manual</div>
+        <div class="manual-subtitle">Microbiology accessioning quick reference for containers, transport,
+          acceptance criteria, and plating.</div>
+      </div>
+      <button class="manual-close" type="button" onclick="closeBenchManual()">Close</button>
+    </div>
+    <div class="manual-toolbar">
+      <input class="manual-search" id="bench-manual-search" type="search"
+        placeholder="Search specimen type, container, transport, or media" autocomplete="off"
+        oninput="filterBenchManual(this.value)">
+    </div>
+    <div class="manual-body" id="bench-manual-content"></div>
+    <div class="manual-empty hidden" id="bench-manual-empty">No bench manual sections matched that search.</div>
+  </aside>
 
   <!-- ══════════════════════════════════════════════════════════════════════
      JAVASCRIPT
@@ -2231,6 +2638,18 @@
     function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
     function pick(arr, n) { return shuffle(arr).slice(0, n); }
     function padTwo(n) { return String(n).padStart(2, '0'); }
+    function escapeHtml(value) {
+      return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[char]));
+    }
+    function normaliseText(value) {
+      return String(value || '').toLowerCase().replace(/\s+/g, ' ').trim();
+    }
 
     function genPHN() {
       // BC PHN: 10 digits
@@ -2469,6 +2888,7 @@
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById(id).classList.add('active');
+      if (id !== 'screen-case') closeBenchManual();
     }
 
     function getCaseIndexByNum(caseNum) {
@@ -2570,7 +2990,7 @@
       labelEl.style.setProperty('--hand', c.handFont);
       labelEl.innerHTML = renderLabel(c);
       // Render specimen details
-      document.getElementById('specimen-details').innerHTML = renderSpecimenDetails(c);
+      document.getElementById('specimen-details').innerHTML = renderSpecimenDetails(c, !!reviewContext);
 
       if (reviewContext) renderReviewState(c, reviewContext.result);
     }
@@ -2585,7 +3005,7 @@
       return `
     <div class="req-form-top">
       <div>
-        <div class="req-lab-name">Northern Health — CNC Health Sciences Lab</div>
+        <div class="req-lab-name">Northern Health — CNC General Hospital Laboratory Services</div>
         <div class="req-lab-sub">1000 Kerry Way, Prince George, BC &nbsp;|&nbsp; Tel: 250-562-2131</div>
       </div>
       <div>
@@ -2643,7 +3063,7 @@
 
     <div class="req-footer">
       <span>Form MBR-1 Rev.4</span>
-      <span>CNC Health Sciences / Northern Health Authority</span>
+      <span>CNCGH Laboratory Services / Northern Health Authority</span>
     </div>
   `;
     }
@@ -2680,7 +3100,7 @@
   `;
     }
 
-    function renderSpecimenDetails(c) {
+    function renderSpecimenDetails(c, showReference = false) {
       const contFlag = c.errors.includes('specimen_wrong_container') || c.errors.includes('specimen_inadequate_fixative');
       const transpFlag = c.errors.includes('specimen_transport_error') || c.errors.includes('specimen_stability_temp');
       const qtyFlag = c.errors.includes('specimen_insufficient') || c.errors.includes('specimen_too_large');
@@ -2692,8 +3112,40 @@
       const collectedStr = [c.label.date, c.label.time].filter(Boolean).join(' ') || '—';
 
       const leakNote = c.specNotes
-        ? `<div class="obs-note-row">⚠ ${c.specNotes}</div>`
+        ? `<div class="obs-note-row${showReference ? '' : ' info'}">${showReference ? '⚠ ' : ''}${escapeHtml(c.specNotes)}</div>`
         : '';
+
+      if (!showReference) {
+        return `
+    <table class="obs-table">
+      <thead><tr>
+        <th class="obs-th-field"></th>
+        <th class="obs-th-received">Received</th>
+      </tr></thead>
+      <tbody>
+        <tr>
+          <td class="obs-td-field">Container</td>
+          <td class="obs-td-received">${escapeHtml(c.container)}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Transport</td>
+          <td class="obs-td-received">${escapeHtml(c.transport)}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Qty / Appear.</td>
+          <td class="obs-td-received">${escapeHtml(c.qty)}</td>
+        </tr>
+        <tr>
+          <td class="obs-td-field">Collected</td>
+          <td class="obs-td-received">${escapeHtml(collectedStr)}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="obs-note-row info">Use the Bench Manual to verify
+      accepted containers, transport, stability, and plating.</div>
+    ${leakNote}
+  `;
+      }
 
       return `
     <table class="obs-table">
@@ -2705,28 +3157,281 @@
       <tbody>
         <tr>
           <td class="obs-td-field">Container</td>
-          <td class="obs-td-received${contFlag ? ' flag' : ''}">${c.container}</td>
-          <td class="obs-td-required">${reqContainer}</td>
+          <td class="obs-td-received${contFlag ? ' flag' : ''}">${escapeHtml(c.container)}</td>
+          <td class="obs-td-required">${escapeHtml(reqContainer)}</td>
         </tr>
         <tr>
           <td class="obs-td-field">Transport</td>
-          <td class="obs-td-received${transpFlag ? ' flag' : ''}">${c.transport}</td>
-          <td class="obs-td-required">${reqTransport}</td>
+          <td class="obs-td-received${transpFlag ? ' flag' : ''}">${escapeHtml(c.transport)}</td>
+          <td class="obs-td-required">${escapeHtml(reqTransport)}</td>
         </tr>
         <tr>
           <td class="obs-td-field">Qty / Appear.</td>
-          <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${c.qty}</td>
-          <td class="obs-td-required">${standardQty}</td>
+          <td class="obs-td-received${qtyFlag ? ' flag' : ''}">${escapeHtml(c.qty)}</td>
+          <td class="obs-td-required">${escapeHtml(standardQty)}</td>
         </tr>
         <tr>
           <td class="obs-td-field">Stability</td>
-          <td class="obs-td-received">Collected: ${collectedStr}</td>
-          <td class="obs-td-required">Max ${maxHours} h from collection</td>
+          <td class="obs-td-received">Collected: ${escapeHtml(collectedStr)}</td>
+          <td class="obs-td-required">Max ${escapeHtml(maxHours)} h from collection</td>
         </tr>
       </tbody>
     </table>
     ${leakNote}
   `;
+    }
+
+    function renderManualList(items) {
+      return `<ul class="manual-list">${items.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
+    }
+
+    function renderManualChips(items) {
+      return items.map(item => `<span class="manual-chip">${escapeHtml(item)}</span>`).join('');
+    }
+
+    function getBenchPlatingVariants(spec) {
+      if (spec.type === 'Urine') {
+        return [
+          { label: 'Standard urine / catheter urine', data: getPlatingSpec(spec.type, 'Voided Urine — Clean Catch Midstream') },
+          { label: 'Suprapubic aspirate', data: getPlatingSpec(spec.type, 'Suprapubic Aspirate') }
+        ];
+      }
+      return [{ label: spec.sources[0], data: getPlatingSpec(spec.type, spec.sources[0]) }];
+    }
+
+    function buildBenchManualMarkup() {
+      const labelRules = Object.values(ERROR_META).filter(meta => meta.cat === 'label').map(meta => meta.desc);
+      const reqRules = Object.values(ERROR_META).filter(meta => meta.cat === 'req').map(meta => meta.desc);
+
+      const specimenEntries = SPECIMENS.map(spec => {
+        const acceptanceNotes = [
+          `Expected quantity / appearance: ${spec.notes}`,
+          `Reject if insufficient: ${spec.quantityInsufficient}`,
+          `Maximum age from collection: ${spec.maxHours} ${spec.maxHours === 1 ? 'hour' : 'hours'}`,
+          `Preferred transport condition: ${spec.transportTemp}`,
+          spec.formalinWrong ? 'Do not accept formalin-fixed tissue for culture.' : ''
+        ].filter(Boolean);
+        const searchText = [
+          spec.type,
+          ...spec.sources,
+          ...spec.validContainers,
+          ...spec.wrongContainers,
+          ...spec.validTransport,
+          ...spec.wrongTransport,
+          ...spec.tests,
+          ...acceptanceNotes
+        ].join(' ');
+        return `
+      <details class="manual-entry" data-manual-entry data-search="${escapeHtml(searchText)}">
+        <summary>
+          <span class="manual-entry-title">${escapeHtml(spec.type)}</span>
+          <span class="manual-entry-tag">${escapeHtml(spec.maxHours)}h stability</span>
+        </summary>
+        <div class="manual-entry-body">
+          <div class="manual-card-grid">
+            <div class="manual-card">
+              <div class="manual-card-title">Acceptable Containers</div>
+              ${renderManualList(spec.validContainers)}
+            </div>
+            <div class="manual-card">
+              <div class="manual-card-title">Do Not Accept</div>
+              ${renderManualList(spec.wrongContainers)}
+            </div>
+            <div class="manual-card">
+              <div class="manual-card-title">Transport</div>
+              ${renderManualList([
+          ...spec.validTransport.map(item => `Accept: ${item}`),
+          ...spec.wrongTransport.map(item => `Do not accept: ${item}`)
+        ])}
+            </div>
+            <div class="manual-card">
+              <div class="manual-card-title">Acceptance Notes</div>
+              ${renderManualList(acceptanceNotes)}
+            </div>
+          </div>
+          <div class="manual-subsection">
+            <div class="manual-section-label">Common Sources / Sites</div>
+            <div class="manual-chip-row">${renderManualChips(spec.sources)}</div>
+          </div>
+          <div class="manual-subsection">
+            <div class="manual-section-label">Common Ordered Tests</div>
+            <div class="manual-chip-row">${renderManualChips(spec.tests)}</div>
+          </div>
+        </div>
+      </details>`;
+      }).join('');
+
+      const platingEntries = SPECIMENS.map(spec => {
+        const variants = getBenchPlatingVariants(spec);
+        const searchText = [spec.type, ...variants.flatMap(variant => [
+          variant.label,
+          variant.data.notes || '',
+          variant.data.message || '',
+          ...(variant.data.required || []),
+          ...(variant.data.conditional || [])
+        ])].join(' ');
+        return `
+      <details class="manual-entry" data-manual-entry data-search="${escapeHtml(searchText)}">
+        <summary>
+          <span class="manual-entry-title">${escapeHtml(spec.type)}</span>
+          <span class="manual-entry-tag">${variants.every(variant => variant.data.skip) ? 'Forward / no plating' : 'Plating setup'}</span>
+        </summary>
+        <div class="manual-entry-body">
+          ${variants.map(variant => `
+            <div class="manual-variant">
+              <div class="manual-variant-title">${escapeHtml(variant.label)}</div>
+              ${variant.data.skip
+            ? `<div class="manual-note-box">${escapeHtml(variant.data.message)}</div>`
+            : `
+                  <div class="manual-card-grid">
+                    <div class="manual-card">
+                      <div class="manual-card-title">Required Media</div>
+                      ${renderManualList(variant.data.required || [])}
+                    </div>
+                    <div class="manual-card">
+                      <div class="manual-card-title">Conditional Media</div>
+                      ${(variant.data.conditional && variant.data.conditional.length)
+              ? renderManualList(variant.data.conditional)
+              : '<div class="manual-muted-copy">No conditional media listed for this setup.</div>'}
+                    </div>
+                  </div>
+                  ${variant.data.notes ? `<div class="manual-note-box">${escapeHtml(variant.data.notes)}</div>` : ''}
+                `}
+            </div>
+          `).join('')}
+        </div>
+      </details>`;
+      }).join('');
+
+      const mediaLegend = MEDIA_GROUPS.map(group => `
+      <div class="manual-mini-block">
+        <div class="manual-mini-title">${escapeHtml(group.name)}</div>
+        ${renderManualList(group.items.map(item => item.val.replace(/\s+/g, ' ').trim() + ' — ' + item.label.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()))}
+      </div>`).join('');
+
+      return `
+    <details class="manual-section" open data-search="bench manual how to use acceptance reject requisition label container transport plating">
+      <summary>Using This Manual</summary>
+      <div class="manual-section-body">
+        <p>Live cases show only the specimen information that was received. Compare that information against this
+          bench manual before you decide whether to accept or reject the specimen.</p>
+        ${renderManualList([
+        'Check the specimen label and requisition against each other before assessing the physical specimen.',
+        'Verify the container, transport condition, quantity, and collection age against the specimen-specific section below.',
+        'Use the plating section only after you have accepted the specimen for processing.',
+        'Review mode shows the received-versus-required comparison after the case is complete.'
+      ])}
+      </div>
+    </details>
+
+    <details class="manual-section" open data-search="acceptance criteria rejection criteria specimen label requisition identifiers provider tests source date time">
+      <summary>Acceptance Checklist</summary>
+      <div class="manual-section-body">
+        <p>Use this checklist before accessioning any specimen.</p>
+        ${renderManualList([
+        'Verify patient identity on the specimen label before anything else.',
+        'Match the specimen label against the requisition.',
+        'Confirm the specimen type, source/site, and requested testing are documented.',
+        'Assess the physical specimen: container, transport, quantity/appearance, leakage, fixative, and stability.',
+        'If required information is missing or the specimen is unsuitable for culture, do not accession until the issue is resolved.'
+      ])}
+        <div class="manual-split" style="margin-top:14px">
+          <div class="manual-mini-block">
+            <div class="manual-mini-title">Label Requirements</div>
+            ${renderManualList(labelRules)}
+          </div>
+          <div class="manual-mini-block">
+            <div class="manual-mini-title">Requisition Requirements</div>
+            ${renderManualList(reqRules)}
+          </div>
+        </div>
+      </div>
+    </details>
+
+    <details class="manual-section" open data-search="specimen containers transport stability quantity appearance sources tests culture">
+      <summary>Specimen Containers, Transport, and Stability</summary>
+      <div class="manual-section-body manual-entry-stack">
+        ${specimenEntries}
+      </div>
+    </details>
+
+    <details class="manual-section" open data-search="plating media agar broth gram stain urine blood culture wound sputum stool throat nasopharyngeal swab csf tissue">
+      <summary>Plating Reference</summary>
+      <div class="manual-section-body manual-entry-stack">
+        ${platingEntries}
+      </div>
+    </details>
+
+    <details class="manual-section" data-search="media legend bap mac cap cled gm xld he cin camp thio">
+      <summary>Media Legend</summary>
+      <div class="manual-section-body">
+        <div class="manual-split">
+          ${mediaLegend}
+        </div>
+      </div>
+    </details>`;
+    }
+
+    function renderBenchManual() {
+      const manualContent = document.getElementById('bench-manual-content');
+      if (!manualContent) return;
+      manualContent.innerHTML = buildBenchManualMarkup();
+      filterBenchManual(document.getElementById('bench-manual-search')?.value || '');
+    }
+
+    function filterBenchManual(value) {
+      const query = normaliseText(value);
+      const sections = [...document.querySelectorAll('#bench-manual-content .manual-section')];
+      let visibleCount = 0;
+
+      sections.forEach(section => {
+        const sectionMatches = !query || normaliseText(section.dataset.search || '').includes(query);
+        const entries = [...section.querySelectorAll('[data-manual-entry]')];
+        let visibleEntries = 0;
+
+        entries.forEach(entry => {
+          const entryMatches = !query || sectionMatches || normaliseText(entry.dataset.search || '').includes(query);
+          entry.hidden = !entryMatches;
+          if (entryMatches) visibleEntries += 1;
+        });
+
+        const showSection = !query || sectionMatches || visibleEntries > 0;
+        section.hidden = !showSection;
+        if (showSection) {
+          visibleCount += 1;
+          if (query) section.open = true;
+        }
+      });
+
+      document.getElementById('bench-manual-empty').classList.toggle('hidden', visibleCount > 0);
+    }
+
+    function openBenchManual() {
+      document.body.classList.add('manual-open');
+      document.getElementById('bench-manual-overlay').classList.add('open');
+      document.getElementById('bench-manual').classList.add('open');
+      document.getElementById('bench-manual').setAttribute('aria-hidden', 'false');
+      document.getElementById('btn-bench-manual').setAttribute('aria-expanded', 'true');
+      const search = document.getElementById('bench-manual-search');
+      filterBenchManual(search.value || '');
+      setTimeout(() => search.focus(), 20);
+    }
+
+    function closeBenchManual() {
+      document.body.classList.remove('manual-open');
+      document.getElementById('bench-manual-overlay').classList.remove('open');
+      document.getElementById('bench-manual').classList.remove('open');
+      document.getElementById('bench-manual').setAttribute('aria-hidden', 'true');
+      document.getElementById('btn-bench-manual').setAttribute('aria-expanded', 'false');
+    }
+
+    function toggleBenchManual() {
+      const drawer = document.getElementById('bench-manual');
+      if (drawer.classList.contains('open')) {
+        closeBenchManual();
+      } else {
+        openBenchManual();
+      }
     }
 
     function renderReviewPlating(c, result) {
@@ -3184,8 +3889,16 @@
       if (state.clockInterval) clearInterval(state.clockInterval);
       state.reviewMode = null;
       document.getElementById('input-tech-id').value = '';
+      document.getElementById('bench-manual-search').value = '';
+      filterBenchManual('');
+      closeBenchManual();
       showScreen('screen-login');
     }
+
+    renderBenchManual();
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeBenchManual();
+    });
   </script>
 </body>
 

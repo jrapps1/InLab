@@ -717,6 +717,13 @@
       border-top-color: #BFDBFE;
     }
 
+    .obs-physical-flag {
+      margin-top: 4px;
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--reject);
+    }
+
     /* ── DECISION PANEL ────────────────────────────────────────────────────── */
     .decision-panel {
       padding: 14px;
@@ -2692,13 +2699,17 @@
     function generateCases(n) {
       const cases = [];
       const categories = [];
-      const perCat = Math.max(1, Math.floor(n / 5));
-      categories.push(...Array(Math.ceil(n * 0.15)).fill('ok'));
-      categories.push(...Array(Math.ceil(n * 0.25)).fill('label'));
-      categories.push(...Array(Math.ceil(n * 0.25)).fill('req'));
-      categories.push(...Array(Math.ceil(n * 0.20)).fill('specimen'));
-      categories.push(...Array(Math.ceil(n * 0.15)).fill('mixed'));
-      const cats = shuffle(categories).slice(0, n);
+      const ok   = Math.round(n * 0.30);
+      const lbl  = Math.round(n * 0.20);
+      const req  = Math.round(n * 0.20);
+      const spec = Math.round(n * 0.15);
+      const mix  = n - ok - lbl - req - spec;
+      categories.push(...Array(ok).fill('ok'));
+      categories.push(...Array(lbl).fill('label'));
+      categories.push(...Array(req).fill('req'));
+      categories.push(...Array(spec).fill('specimen'));
+      categories.push(...Array(mix).fill('mixed'));
+      const cats = shuffle(categories);
 
       for (let i = 0; i < n; i++) {
         cases.push(generateOneCase(i + 1, cats[i] || 'mixed'));
@@ -2751,7 +2762,7 @@
       // Build label fields
       const labelPHN = errors.includes('label_phn_mismatch') ? altPHN(phn) : phn;
       const labelName = errors.includes('label_name_mismatch') ? altName(firstName, lastName) : fullName;
-      const labelDOB = errors.includes('label_dob_mismatch') ? `${dob.iso.slice(0, 4)}-${padTwo(randInt(1, 12))}-${padTwo(randInt(1, 28))}` : dob.display;
+      const labelDOB = dob.display;
       const label = {
         name: errors.includes('label_no_name') ? '' : labelName,
         identifier: errors.includes('label_no_identifier') ? '' : labelPHN,
@@ -2865,9 +2876,11 @@
 
     /* ── START SESSION ───────────────────────────────────────────────────── */
     function startSession() {
+      const errBanner = document.getElementById('login-error');
+      errBanner.classList.add('hidden');
       const id = document.getElementById('input-tech-id').value.trim().toUpperCase();
       if (!id) {
-        document.getElementById('login-error').classList.remove('hidden');
+        errBanner.classList.remove('hidden');
         return;
       }
       state.studentId = id;
@@ -3112,7 +3125,7 @@
       const collectedStr = [c.label.date, c.label.time].filter(Boolean).join(' ') || '—';
 
       const leakNote = c.specNotes
-        ? `<div class="obs-note-row${showReference ? '' : ' info'}">${showReference ? '⚠ ' : ''}${escapeHtml(c.specNotes)}</div>`
+        ? `<div class="obs-note-row">⚠ ${escapeHtml(c.specNotes)}</div>`
         : '';
 
       if (!showReference) {
@@ -3133,7 +3146,7 @@
         </tr>
         <tr>
           <td class="obs-td-field">Qty / Appear.</td>
-          <td class="obs-td-received">${escapeHtml(c.qty)}</td>
+          <td class="obs-td-received">${escapeHtml(c.qty)}${c.specNotes ? `<div class="obs-physical-flag">⚠ ${escapeHtml(c.specNotes)}</div>` : ''}</td>
         </tr>
         <tr>
           <td class="obs-td-field">Collected</td>
@@ -3143,7 +3156,6 @@
     </table>
     <div class="obs-note-row info">Use the Bench Manual to verify
       accepted containers, transport, stability, and plating.</div>
-    ${leakNote}
   `;
       }
 
@@ -3539,10 +3551,9 @@
 
       state.pendingDecision = { studentDecision, studentReasons, correct, missedReasons, extraReasons, score };
 
-      if (studentDecision === 'ACCEPT') {
+      if (studentDecision === 'ACCEPT' && c.verdict === 'ACCEPT') {
         showPlatingStep(c);
       } else {
-        // REJECT — no plating, go straight to feedback
         finaliseCase(c, null);
       }
     }

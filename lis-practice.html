@@ -2498,7 +2498,7 @@
 
     function openCaseReview(caseNum, returnScreen) {
       const result = getResultByCaseNum(caseNum);
-      if (!result || result.score === 'correct') return;
+      if (!result) return;
       state.reviewMode = { caseNum, returnScreen };
       showScreen('screen-case');
       renderCase();
@@ -3015,7 +3015,7 @@
 
       const allDone = state.results.length >= state.cases.length;
       document.getElementById('btn-next-case').textContent = '← Return to Worklist';
-      document.getElementById('btn-review-case-feedback').style.display = score === 'correct' ? 'none' : '';
+      document.getElementById('btn-review-case-feedback').style.display = '';
       document.getElementById('btn-new-worklist-feedback').style.display = allDone ? '' : 'none';
     }
 
@@ -3050,9 +3050,7 @@
         if (result) {
           const label = { correct: '✓ Correct', partial: '~ Partial', incorrect: '✗ Incorrect' }[result.score];
           const cls = { correct: 'wl-status-correct', partial: 'wl-status-partial', incorrect: 'wl-status-incorrect' }[result.score];
-          const action = result.score === 'correct'
-            ? ''
-            : `<button class="btn-review-case" onclick="event.stopPropagation();openCaseReview(${c.num}, 'screen-worklist')">Review</button>`;
+          const action = `<button class="btn-review-case" onclick="event.stopPropagation();openCaseReview(${c.num}, 'screen-worklist')">Review</button>`;
           return `<tr class="wl-row-complete">
         <td><span class="wl-status ${cls}">${label}</span></td>
         <td class="wl-acc">${c.reqNum}</td>
@@ -3140,7 +3138,7 @@
       <td style="font-size:11px;font-weight:600;${platingColour[platingScore]}">${platingScore === 'skip' ? 'N/A' : platingScore ? platingScore.charAt(0).toUpperCase() + platingScore.slice(1) : '—'}</td>
       <td style="font-size:11px">${missedPlates}</td>
       <td style="font-size:11px">${extraPlates}</td>
-      <td>${r.score === 'correct' ? '—' : `<button class="btn-review-case" onclick="openCaseReview(${r.caseNum}, 'screen-summary')">Review</button>`}</td>
+      <td><button class="btn-review-case" onclick="openCaseReview(${r.caseNum}, 'screen-summary')">Review</button></td>
     </tr>`;
       }).join('');
     }

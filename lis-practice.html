@@ -3221,7 +3221,8 @@
           `Reject if insufficient: ${spec.quantityInsufficient}`,
           `Maximum age from collection: ${spec.maxHours} ${spec.maxHours === 1 ? 'hour' : 'hours'}`,
           `Preferred transport condition: ${spec.transportTemp}`,
-          spec.formalinWrong ? 'Do not accept formalin-fixed tissue for culture.' : ''
+          spec.formalinWrong ? 'Do not accept formalin-fixed tissue for culture.' : '',
+          spec.type === 'Blood Culture' ? 'Exception — when ordered specifically as "Aerobic Blood Culture": a single aerobic bottle is acceptable; an anaerobic bottle is not required.' : ''
         ].filter(Boolean);
         const searchText = [
           spec.type,
@@ -3243,7 +3244,9 @@
           <div class="manual-card-grid">
             <div class="manual-card">
               <div class="manual-card-title">Acceptable Containers</div>
-              ${renderManualList(spec.validContainers)}
+              ${renderManualList(spec.type === 'Blood Culture'
+          ? [...spec.validContainers, '1 aerobic blood culture bottle (Aerobic Blood Culture orders only)']
+          : spec.validContainers)}
             </div>
             <div class="manual-card">
               <div class="manual-card-title">Do Not Accept</div>

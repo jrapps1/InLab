@@ -429,7 +429,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
               <div class="errors-grid">
                 <div class="error-check"><input type="checkbox" id="ce-specimen_wrong_container"><label for="ce-specimen_wrong_container">Incorrect container</label></div>
                 <div class="error-check"><input type="checkbox" id="ce-specimen_insufficient"><label for="ce-specimen_insufficient">Insufficient quantity</label></div>
-                <div class="error-check"><input type="checkbox" id="ce-specimen_transport_error"><label for="ce-specimen_transport_error">Transported incorrectly</label></div>
+                <div class="error-check"><input type="checkbox" id="ce-specimen_transport_error"><label for="ce-specimen_transport_error">Incorrect transport conditions (temperature/timing)</label></div>
                 <div class="error-check"><input type="checkbox" id="ce-specimen_inadequate_fixative"><label for="ce-specimen_inadequate_fixative">Inadequate fixative</label></div>
                 <div class="error-check"><input type="checkbox" id="ce-specimen_too_large"><label for="ce-specimen_too_large">Specimen too large for container</label></div>
                 <div class="error-check"><input type="checkbox" id="ce-specimen_stability_age"><label for="ce-specimen_stability_age">Stability compromised (age)</label></div>
@@ -578,7 +578,7 @@ body { font-family: var(--sans); background: var(--bg); color: var(--text-primar
                 <div class="reasons-cat-title">Specimen Suitability</div>
                 <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_wrong_container"><span class="reason-text">Incorrect specimen collection container</span></label>
                 <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_insufficient"><span class="reason-text">Insufficient specimen quantity</span></label>
-                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_transport_error"><span class="reason-text">Transported incorrectly</span></label>
+                <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_transport_error"><span class="reason-text">Incorrect transport conditions (temperature/timing)</span></label>
                 <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_inadequate_fixative"><span class="reason-text">Inadequate fixative</span></label>
                 <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_too_large"><span class="reason-text">Specimen too large for container</span></label>
                 <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_stability_age"><span class="reason-text">Specimen stability compromised (age)</span></label>
@@ -696,7 +696,7 @@ const ERROR_META = {
   req_no_provider:        { cat: 'req',      desc: 'Missing ordering provider name on requisition' },
   specimen_wrong_container:    { cat: 'specimen', desc: 'Incorrect specimen collection container' },
   specimen_insufficient:       { cat: 'specimen', desc: 'Insufficient specimen quantity' },
-  specimen_transport_error:    { cat: 'specimen', desc: 'Transported incorrectly' },
+  specimen_transport_error:    { cat: 'specimen', desc: 'Incorrect transport conditions (temperature/timing)' },
   specimen_inadequate_fixative:{ cat: 'specimen', desc: 'Inadequate fixative' },
   specimen_too_large:          { cat: 'specimen', desc: 'Specimen too large for container' },
   specimen_stability_age:      { cat: 'specimen', desc: 'Specimen stability compromised (age)' },

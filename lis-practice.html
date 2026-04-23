@@ -2593,7 +2593,7 @@
         case 'Urine':
           if (s.toLowerCase().includes('suprapubic'))
             return {
-              required: ['GM', 'BAP CO2', 'CAP CO2', 'MAC O2'], conditional: [], skip: false,
+              required: ['GM', 'BAP CO2', 'CAP CO2', 'MAC O2', 'BAP ANA'], conditional: [], skip: false,
               notes: 'Suprapubic aspirate — full set including Gram stain and anaerobic BAP'
             };
           return {
@@ -2679,9 +2679,12 @@
       };
     }
     function altPHN(phn) {
-      // Change last 4 digits
-      const base = phn.slice(0, 7);
-      return base + randInt(1000, 9999);
+      // Change last segment only, preserving XXXX-XXX-XXX format
+      const parts = phn.split('-');
+      let newLast;
+      do { newLast = String(randInt(0, 999)).padStart(3, '0'); } while (newLast === parts[2]);
+      parts[2] = newLast;
+      return parts.join('-');
     }
     function altName(first, last) {
       // Return a similar but different name
@@ -2694,8 +2697,8 @@
 
     /* ── CASE GENERATION ─────────────────────────────────────────────────── */
     /* Distribution strategy for N cases:
-       ~20% acceptable, ~25% label-only errors, ~25% req-only errors,
-       ~20% specimen suitability, ~10% mixed errors */
+       ~30% acceptable, ~20% label-only errors, ~20% req-only errors,
+       ~15% specimen suitability, ~15% mixed errors */
     function generateCases(n) {
       const cases = [];
       const categories = [];
@@ -2736,15 +2739,26 @@
       if (category === 'ok') {
         errors = [];
       } else if (category === 'label') {
-        const pool = ['label_no_name', 'label_no_identifier', 'label_no_date', 'label_no_time', 'label_name_mismatch', 'label_phn_mismatch'];
-        errors = pick(pool, randInt(1, 2));
+        // Keep mutually exclusive pairs in separate sub-groups so we never get
+        // e.g. "missing name" + "name mismatch" (mismatch is unverifiable when field is blank).
+        const nameGroup = shuffle(['label_no_name', 'label_name_mismatch']);
+        const idGroup   = shuffle(['label_no_identifier', 'label_phn_mismatch']);
+        const dtGroup   = shuffle(['label_no_date', 'label_no_time']);
+        const candidates = shuffle([nameGroup[0], idGroup[0], dtGroup[0]]);
+        errors = candidates.slice(0, randInt(1, 2));
       } else if (category === 'req') {
         const pool = ['req_no_name', 'req_no_dob', 'req_no_phn', 'req_no_tests', 'req_no_source', 'req_no_date', 'req_no_provider'];
         errors = pick(pool, randInt(1, 2));
       } else if (category === 'specimen') {
-        const pool = ['specimen_wrong_container', 'specimen_insufficient', 'specimen_transport_error', 'specimen_stability_age', 'specimen_stability_temp', 'specimen_leaking'];
-        if (spec.type === 'Tissue') pool.push('specimen_inadequate_fixative', 'specimen_too_large');
-        else pool.push('specimen_too_large');
+        // specimen_stability_temp is kept only as a student-selectable equivalent of
+        // specimen_transport_error (via EQUIVALENT_GROUPS); injecting both as errors
+        // in the same case would produce contradictory feedback.
+        const pool = ['specimen_wrong_container', 'specimen_insufficient', 'specimen_transport_error', 'specimen_stability_age', 'specimen_leaking'];
+        if (spec.type === 'Tissue') {
+          pool.push('specimen_inadequate_fixative', 'specimen_too_large');
+        } else if (['Stool', 'Sputum'].includes(spec.type)) {
+          pool.push('specimen_too_large');
+        }
         errors = pick(pool, randInt(1, 2));
       } else {
         // mixed: 1 from each of 2 categories
@@ -2759,15 +2773,26 @@
         });
       }
 
+      // Determine effective collection date/time FIRST — stability_age shifts the
+      // collection timestamp, which must be resolved before building label/req fields
+      // so that label_no_date/label_no_time errors are never silently overwritten.
+      let stabilityHours = null, stabilityMaxHours = null;
+      let effectiveCollected = collected;
+      if (errors.includes('specimen_stability_age')) {
+        const oldHours = randInt(spec.maxHours + 2, spec.maxHours + 24);
+        stabilityHours = oldHours;
+        stabilityMaxHours = spec.maxHours;
+        effectiveCollected = genDate(oldHours);
+      }
+
       // Build label fields
       const labelPHN = errors.includes('label_phn_mismatch') ? altPHN(phn) : phn;
       const labelName = errors.includes('label_name_mismatch') ? altName(firstName, lastName) : fullName;
-      const labelDOB = dob.display;
       const label = {
         name: errors.includes('label_no_name') ? '' : labelName,
         identifier: errors.includes('label_no_identifier') ? '' : labelPHN,
-        date: errors.includes('label_no_date') ? '' : collected.display,
-        time: errors.includes('label_no_time') ? '' : collected.time,
+        date: errors.includes('label_no_date') ? '' : effectiveCollected.display,
+        time: errors.includes('label_no_time') ? '' : effectiveCollected.time,
       };
 
       // Build requisition fields
@@ -2777,7 +2802,7 @@
         phn: errors.includes('req_no_phn') ? '' : phn,
         tests: errors.includes('req_no_tests') ? '' : test,
         source: errors.includes('req_no_source') ? '' : source,
-        date: errors.includes('req_no_date') ? '' : collected.display,
+        date: errors.includes('req_no_date') ? '' : effectiveCollected.display,
         provider: errors.includes('req_no_provider') ? '' : physician,
       };
 
@@ -2793,13 +2818,15 @@
       let specRequiredContainer = spec.validContainers[0];
       if (spec.type === 'Blood Culture') {
         const isSingle = test === 'Aerobic Blood Culture';
-        specRequiredContainer = isSingle ? '1 aerobic blood culture bottle' : spec.validContainers[0];
-        specStandardQty = isSingle
-          ? '1 aerobic blood culture bottle, filled to fill line'
-          : 'Aerobic and anaerobic blood culture bottles, both filled to fill line';
+        if (isSingle) {
+          container = '1 aerobic blood culture bottle';
+          specRequiredContainer = '1 aerobic blood culture bottle';
+          specStandardQty = '1 aerobic blood culture bottle, filled to fill line';
+        } else {
+          specStandardQty = 'Aerobic and anaerobic blood culture bottles, both filled to fill line';
+        }
         qty = specStandardQty;
       }
-      let stabilityHours = null, stabilityMaxHours = null;
 
       if (errors.includes('specimen_wrong_container')) {
         container = rand(spec.wrongContainers);
@@ -2814,14 +2841,7 @@
         flagNotes += (flagNotes ? ' | ' : '') + `⚠ Quantity: ${qty}`;
       }
       if (errors.includes('specimen_stability_age')) {
-        const oldHours = randInt(spec.maxHours + 2, spec.maxHours + 24);
-        stabilityHours = oldHours;
-        stabilityMaxHours = spec.maxHours;
-        const oldDate = genDate(oldHours);
-        label.date = oldDate.display;
-        label.time = oldDate.time;
-        req.date = oldDate.display;
-        flagNotes += (flagNotes ? ' | ' : '') + `⚠ Collected ${oldHours}h ago — exceeds ${spec.maxHours}h stability`;
+        flagNotes += (flagNotes ? ' | ' : '') + `⚠ Collected ${stabilityHours}h ago — exceeds ${spec.maxHours}h stability`;
       }
       if (errors.includes('specimen_leaking')) {
         specNotes = 'Visible leakage noted on exterior of container.';
@@ -3649,7 +3669,9 @@
       let reasonsHTML = '';
       if (c.verdict === 'REJECT') {
         const correctList = correct.map(e => {
-          const inStudent = studentReasons.includes(e);
+          // Use equivalents so that e.g. selecting specimen_stability_temp when the
+          // error was specimen_transport_error correctly shows as "Identified".
+          const inStudent = getEquivalents(e).some(eq => studentReasons.includes(eq));
           return `<div class="feedback-row">
         <span class="feedback-tag ${inStudent ? 'tag-correct' : 'tag-missed'}">${inStudent ? '✓ Identified' : '✗ Missed'}</span>
         <span>${ERROR_META[e]?.desc || e}</span>

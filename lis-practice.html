@@ -3228,7 +3228,7 @@
           { label: 'Suprapubic aspirate', data: getPlatingSpec(spec.type, 'Suprapubic Aspirate') }
         ];
       }
-      return [{ label: spec.sources[0], data: getPlatingSpec(spec.type, spec.sources[0]) }];
+      return [{ label: '', data: getPlatingSpec(spec.type, spec.sources[0]) }];
     }
 
     function buildBenchManualMarkup() {
@@ -3314,7 +3314,7 @@
         <div class="manual-entry-body">
           ${variants.map(variant => `
             <div class="manual-variant">
-              <div class="manual-variant-title">${escapeHtml(variant.label)}</div>
+              ${variant.label ? `<div class="manual-variant-title">${escapeHtml(variant.label)}</div>` : ''}
               ${variant.data.skip
             ? `<div class="manual-note-box">${escapeHtml(variant.data.message)}</div>`
             : `

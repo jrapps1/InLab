@@ -161,7 +161,7 @@
 
     .progress-fill {
       height: 100%;
-      background: var(--cnc-red);
+      background: var(--sys-accent);
       border-radius: 3px;
       transition: width 0.4s ease;
     }
@@ -178,6 +178,22 @@
       justify-content: center;
       align-items: center;
       background: linear-gradient(160deg, var(--sys-dark) 0%, #0a2540 100%);
+      background-image:
+        linear-gradient(160deg, var(--sys-dark) 0%, #0a2540 100%),
+        repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px),
+        repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(255,255,255,0.03) 39px, rgba(255,255,255,0.03) 40px);
+      background-blend-mode: normal, normal, normal;
+    }
+
+    .login-wordmark {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 11px;
+      color: rgba(255,255,255,0.2);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      font-family: var(--mono);
+      user-select: none;
     }
 
     .login-card {
@@ -423,7 +439,7 @@
     }
 
     .req-section-title {
-      font-size: 8px;
+      font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 1px;
@@ -454,7 +470,7 @@
     }
 
     .req-field-label {
-      font-size: 8px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.6px;
       color: var(--text-muted);
@@ -586,7 +602,7 @@
     }
 
     .label-key {
-      font-size: 8px;
+      font-size: 10px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #777;
@@ -632,7 +648,7 @@
 
     .obs-th-field {
       padding: 5px 10px;
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
@@ -644,7 +660,7 @@
 
     .obs-th-received {
       padding: 5px 10px;
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
@@ -655,7 +671,7 @@
 
     .obs-th-required {
       padding: 5px 10px;
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.6px;
@@ -666,7 +682,7 @@
 
     .obs-td-field {
       padding: 7px 10px;
-      font-size: 9px;
+      font-size: 11px;
       font-weight: 700;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -688,7 +704,7 @@
     }
 
     .obs-td-received.flag {
-      color: var(--reject);
+      color: #7C5A00;
       font-weight: 600;
     }
 
@@ -842,7 +858,7 @@
     .btn-submit-case {
       width: 100%;
       padding: 11px;
-      background: var(--sys-dark);
+      background: var(--cnc-red);
       color: #fff;
       border: none;
       border-radius: var(--radius);
@@ -855,7 +871,7 @@
     }
 
     .btn-submit-case:hover {
-      background: var(--sys-mid);
+      background: var(--cnc-red-dark);
     }
 
     .btn-submit-case:disabled {
@@ -2050,6 +2066,7 @@
         </div>
       </div>
     </div>
+    <div class="login-wordmark">CNC General Hospital · Laboratory Services · Microbiology</div>
   </div>
 
   <!-- ══════════════════════════════════════════════════════════════════════
@@ -2299,10 +2316,8 @@
               <th>Correct Verdict</th>
               <th>Your Decision</th>
               <th>Accession Result</th>
-              <th>Missed / Extra Reasons</th>
+              <th>Notes</th>
               <th>Plating Result</th>
-              <th>Missed Plates</th>
-              <th>Extra Plates</th>
               <th>Review</th>
             </tr>
           </thead>
@@ -3755,6 +3770,12 @@
       }
 
       card.innerHTML = `
+    <div style="padding:8px 16px;background:#F3F4F6;border-bottom:1px solid #E5E7EB;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--text-secondary)">
+      <span style="font-family:var(--mono);color:var(--text-muted)">Case ${c.num} &nbsp;·&nbsp; ${c.reqNum}</span>
+      <span style="font-weight:600;color:var(--text-primary)">${c.patient.fullName}</span>
+      <span>·</span>
+      <span>${c.spec.type} — ${c.source}</span>
+    </div>
     <div class="feedback-verdict-banner ${score}">
       <div class="verdict-icon ${score}">${icons[score]}</div>
       <div class="verdict-text">
@@ -3774,7 +3795,7 @@
   `;
 
       const allDone = state.results.length >= state.cases.length;
-      document.getElementById('btn-next-case').textContent = '← Return to Worklist';
+      document.getElementById('btn-next-case').textContent = allDone ? '← Return to Worklist' : 'Next Case →';
       document.getElementById('btn-review-case-feedback').style.display = '';
       document.getElementById('btn-new-worklist-feedback').style.display = allDone ? '' : 'none';
     }
@@ -3886,18 +3907,22 @@
         const pr = r.platingResult;
         const platingScore = pr ? pr.platingScore : (r.studentDecision === 'ACCEPT' ? 'skip' : '—');
         const platingColour = { correct: 'color:var(--accept)', partial: 'color:#E65100', incorrect: 'color:var(--reject)', skip: 'color:var(--text-muted)', '—': '' };
-        const missedPlates = pr ? pr.missedPlates.join(', ') || '—' : '—';
-        const extraPlates = pr ? pr.extraPlates.join(', ') || '—' : '—';
+        const missedPlates = pr ? pr.missedPlates.join(', ') : '';
+        const extraPlates = pr ? pr.extraPlates.join(', ') : '';
+        const notesParts = [];
+        if (missed) notesParts.push(`<em>Missed:</em> ${missed}`);
+        if (extra) notesParts.push(`<em>Extra:</em> ${extra}`);
+        if (missedPlates) notesParts.push(`<em>Missed plates:</em> ${missedPlates}`);
+        if (extraPlates) notesParts.push(`<em>Extra plates:</em> ${extraPlates}`);
+        const notesCell = notesParts.join('<br>') || '—';
         return `<tr>
       <td class="td-case">${r.reqNum}</td>
       <td>${r.specType}</td>
       <td><span class="pill ${r.correctVerdict === 'ACCEPT' ? 'pill-accept' : 'pill-reject'}">${r.correctVerdict}</span></td>
       <td><span class="pill ${r.studentDecision === 'ACCEPT' ? 'pill-accept' : 'pill-reject'}">${r.studentDecision}</span></td>
       <td class="td-verdict ${r.score}">${r.score.charAt(0).toUpperCase() + r.score.slice(1)}</td>
-      <td style="font-size:11px;color:#666">${missed ? `<em>Missed:</em> ${missed}` : ''}${missed && extra ? '<br>' : ''}${extra ? `<em>Extra:</em> ${extra}` : ''}${!missed && !extra ? '—' : ''}</td>
+      <td style="font-size:11px;color:#666">${notesCell}</td>
       <td style="font-size:11px;font-weight:600;${platingColour[platingScore]}">${platingScore === 'skip' ? 'N/A' : platingScore ? platingScore.charAt(0).toUpperCase() + platingScore.slice(1) : '—'}</td>
-      <td style="font-size:11px">${missedPlates}</td>
-      <td style="font-size:11px">${extraPlates}</td>
       <td><button class="btn-review-case" onclick="openCaseReview(${r.caseNum}, 'screen-summary')">Review</button></td>
     </tr>`;
       }).join('');

@@ -2644,6 +2644,25 @@
     function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
     function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5); }
     function pick(arr, n) { return shuffle(arr).slice(0, n); }
+
+    // Weighted pool reflecting real-world micro lab prevalence. Rare types (NPS, CSF,
+    // Tissue) are excluded here because they are guaranteed via the floor below.
+    const SPECIMEN_WEIGHTED_POOL = [
+      ...Array(30).fill('Urine'),
+      ...Array(20).fill('Wound Swab'),
+      ...Array(18).fill('Blood Culture'),
+      ...Array(12).fill('Sputum'),
+      ...Array(8).fill('Stool'),
+      ...Array(7).fill('Throat Swab'),
+    ];
+    const SPECIMEN_FLOOR_TYPES = ['Nasopharyngeal Swab', 'CSF', 'Tissue'];
+
+    function pickSpecimenTypes(n) {
+      const guaranteed = shuffle([...SPECIMEN_FLOOR_TYPES]).slice(0, Math.min(SPECIMEN_FLOOR_TYPES.length, n));
+      const pool = [...guaranteed];
+      for (let i = pool.length; i < n; i++) pool.push(rand(SPECIMEN_WEIGHTED_POOL));
+      return shuffle(pool).map(type => SPECIMENS.find(s => s.type === type));
+    }
     function padTwo(n) { return String(n).padStart(2, '0'); }
     function escapeHtml(value) {
       return String(value ?? '').replace(/[&<>"']/g, char => ({
@@ -2713,21 +2732,21 @@
       categories.push(...Array(spec).fill('specimen'));
       categories.push(...Array(mix).fill('mixed'));
       const cats = shuffle(categories);
+      const specs = pickSpecimenTypes(n);
 
       for (let i = 0; i < n; i++) {
-        cases.push(generateOneCase(i + 1, cats[i] || 'mixed'));
+        cases.push(generateOneCase(i + 1, cats[i] || 'mixed', specs[i]));
       }
       return cases;
     }
 
-    function generateOneCase(num, category) {
+    function generateOneCase(num, category, spec) {
       const firstName = rand(FIRST_NAMES);
       const lastName = rand(LAST_NAMES);
       const fullName = `${firstName} ${lastName}`;
       const dob = genDOB();
       const phn = genPHN();
       const physician = rand(PHYSICIANS);
-      const spec = rand(SPECIMENS);
       const source = rand(spec.sources);
       const test = rand(spec.tests);
       const hoursAgo = randInt(0, 3);

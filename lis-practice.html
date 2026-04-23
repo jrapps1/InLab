@@ -1646,23 +1646,18 @@
     }
 
     /* ── BENCH MANUAL ──────────────────────────────────────────────────────── */
-    body.manual-open {
-      overflow: hidden;
+    .screen.active {
+      transition: padding-right 0.24s ease;
+    }
+
+    @media (min-width: 981px) {
+      body.manual-open .screen.active {
+        padding-right: var(--manual-drawer-width);
+      }
     }
 
     .manual-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(13, 27, 42, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.22s ease;
-      z-index: 240;
-    }
-
-    .manual-overlay.open {
-      opacity: 1;
-      pointer-events: auto;
+      display: none;
     }
 
     .manual-drawer {
@@ -2332,7 +2327,7 @@
     </div>
   </div>
 
-  <div id="bench-manual-overlay" class="manual-overlay" onclick="closeBenchManual()"></div>
+  <div id="bench-manual-overlay" class="manual-overlay"></div>
   <aside id="bench-manual" class="manual-drawer" aria-hidden="true">
     <div class="manual-header">
       <div>
@@ -2647,7 +2642,7 @@
         case 'Tissue':
           return {
             required: ['GM', 'BAP CO2', 'CAP CO2', 'MAC O2', 'BAP ANA', 'THIO'], conditional: ['BBE AnA', 'PEA AnA'], skip: false,
-            notes: 'BBE AnA added if abdominal source; PEA AnA added if β-haemolysis seen on Gram stain'
+            notes: 'BBE AnA added if abdominal source; PEA AnA added if Gram-negative bacilli seen on Gram stain'
           };
         default:
           return { required: ['BAP CO2', 'MAC O2'], conditional: [], skip: false, notes: '' };

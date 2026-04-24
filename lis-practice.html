@@ -363,6 +363,10 @@
       gap: 14px;
     }
 
+    .case-decision-row {
+      grid-column: 1 / -1;
+    }
+
     /* ── PANEL CARD ────────────────────────────────────────────────────────── */
     .panel {
       background: var(--surface);
@@ -742,26 +746,32 @@
 
     /* ── DECISION PANEL ────────────────────────────────────────────────────── */
     .decision-panel {
-      padding: 14px;
+      padding: 14px 16px;
+    }
+
+    .decision-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
     }
 
     .decision-question {
       font-size: 13px;
       font-weight: 600;
-      margin-bottom: 12px;
       color: var(--text-primary);
     }
 
     .decision-btns {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
+      display: flex;
       gap: 8px;
-      margin-bottom: 14px;
     }
 
     .btn-accept,
     .btn-reject {
-      padding: 12px 8px;
+      padding: 10px 24px;
       border: 2px solid;
       border-radius: var(--radius);
       font-size: 13px;
@@ -794,8 +804,12 @@
       border-color: var(--reject);
     }
 
+    /* ── REJECTION REASON CHIPS ──────────────────────────────────────────────── */
     .reasons-section {
       display: none;
+      border-top: 1px solid var(--form-line);
+      padding-top: 14px;
+      margin-bottom: 14px;
     }
 
     .reasons-section.visible {
@@ -808,56 +822,132 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
       color: var(--text-secondary);
-      margin-bottom: 8px;
+      margin-bottom: 12px;
     }
 
-    .reasons-category {
-      margin-bottom: 10px;
+    .reasons-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
     }
 
-    .reasons-cat-title {
+    .reasons-cat-header {
       font-size: 10px;
       font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--text-muted);
-      margin-bottom: 5px;
-      padding-bottom: 3px;
-      border-bottom: 1px solid var(--form-line);
+      letter-spacing: 0.6px;
+      padding: 5px 8px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      border-left: 3px solid;
     }
 
-    .reason-item {
+    .reasons-cat-header.cat-label-hd {
+      color: #78350F;
+      background: #FEF3C7;
+      border-left-color: #F59E0B;
+    }
+
+    .reasons-cat-header.cat-req-hd {
+      color: #1E3A8A;
+      background: #DBEAFE;
+      border-left-color: #3B82F6;
+    }
+
+    .reasons-cat-header.cat-specimen-hd {
+      color: #7F1D1D;
+      background: #FEE2E2;
+      border-left-color: #EF4444;
+    }
+
+    .reason-chip {
       display: flex;
       align-items: flex-start;
       gap: 7px;
-      padding: 4px 0;
+      padding: 7px 10px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 6px;
       cursor: pointer;
+      background: #fff;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+      margin-bottom: 5px;
+      position: relative;
     }
 
-    .reason-item:hover {
-      background: #F9FAFB;
+    .reason-chip .reason-cb {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
+    }
+
+    .chip-check {
+      width: 15px;
+      height: 15px;
       border-radius: 3px;
-    }
-
-    .reason-cb {
-      width: 14px;
-      height: 14px;
-      border: 1.5px solid #9CA3AF;
-      border-radius: 2px;
+      border: 1.5px solid #CBD5E1;
       flex-shrink: 0;
       margin-top: 1px;
-      accent-color: var(--cnc-red);
+      transition: background 0.15s, border-color 0.15s;
+      position: relative;
     }
 
-    .reason-text {
-      font-size: 12px;
-      line-height: 1.4;
-      color: var(--text-primary);
+    .chip-check::after {
+      content: '';
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -54%) rotate(45deg);
+      width: 4px;
+      height: 7px;
+      border-right: 2px solid #fff;
+      border-bottom: 2px solid #fff;
+    }
+
+    .chip-text {
+      font-size: 11.5px;
+      line-height: 1.35;
+      color: var(--text-secondary);
+    }
+
+    /* Hover */
+    .reason-chip.cat-label:hover   { border-color: #F59E0B; background: #FFFBEB; }
+    .reason-chip.cat-req:hover     { border-color: #3B82F6; background: #EFF6FF; }
+    .reason-chip.cat-specimen:hover { border-color: #EF4444; background: #FFF5F5; }
+
+    /* Selected — Label */
+    .reason-chip.cat-label:has(input:checked) { border-color: #F59E0B; background: #FEF3C7; }
+    .reason-chip.cat-label:has(input:checked) .chip-check { background: #F59E0B; border-color: #F59E0B; }
+    .reason-chip.cat-label:has(input:checked) .chip-check::after { display: block; }
+    .reason-chip.cat-label:has(input:checked) .chip-text { color: #78350F; font-weight: 600; }
+
+    /* Selected — Requisition */
+    .reason-chip.cat-req:has(input:checked) { border-color: #3B82F6; background: #EFF6FF; }
+    .reason-chip.cat-req:has(input:checked) .chip-check { background: #3B82F6; border-color: #3B82F6; }
+    .reason-chip.cat-req:has(input:checked) .chip-check::after { display: block; }
+    .reason-chip.cat-req:has(input:checked) .chip-text { color: #1E3A8A; font-weight: 600; }
+
+    /* Selected — Specimen */
+    .reason-chip.cat-specimen:has(input:checked) { border-color: #EF4444; background: #FFF5F5; }
+    .reason-chip.cat-specimen:has(input:checked) .chip-check { background: #EF4444; border-color: #EF4444; }
+    .reason-chip.cat-specimen:has(input:checked) .chip-check::after { display: block; }
+    .reason-chip.cat-specimen:has(input:checked) .chip-text { color: #7F1D1D; font-weight: 600; }
+
+    /* Disabled (review mode) */
+    .reason-chip:has(input:disabled) { pointer-events: none; opacity: 0.72; }
+
+    .decision-submit-bar {
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 14px;
+      border-top: 1px solid var(--form-line);
     }
 
     .btn-submit-case {
-      width: 100%;
-      padding: 11px;
+      padding: 10px 28px;
       background: var(--cnc-red);
       color: #fff;
       border: none;
@@ -865,7 +955,6 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
       letter-spacing: 0.3px;
       transition: background 0.2s;
     }
@@ -912,8 +1001,8 @@
       background: var(--accept-light);
       border: 1px solid var(--accept-border);
       border-radius: var(--radius);
-      padding: 8px 12px;
-      margin-bottom: 12px;
+      padding: 8px 14px;
+      margin-bottom: 14px;
     }
 
     .plating-skip-msg {
@@ -922,7 +1011,7 @@
       background: #EFF6FF;
       border: 1px solid #BFDBFE;
       border-radius: var(--radius);
-      padding: 10px 12px;
+      padding: 10px 14px;
       margin-bottom: 12px;
       line-height: 1.5;
     }
@@ -931,11 +1020,18 @@
       font-size: 11px;
       color: var(--text-muted);
       font-style: italic;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
+    }
+
+    .plating-groups-wrap {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      align-items: start;
     }
 
     .plating-group {
-      margin-bottom: 10px;
+      margin-bottom: 0;
     }
 
     .plating-group-title {
@@ -944,45 +1040,92 @@
       text-transform: uppercase;
       letter-spacing: 0.6px;
       color: var(--text-muted);
-      margin-bottom: 5px;
-      padding-bottom: 3px;
+      margin-bottom: 7px;
+      padding-bottom: 4px;
       border-bottom: 1px solid var(--form-line);
     }
 
-    .plating-item {
+    .plate-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 5px;
+    }
+
+    .plate-card {
       display: flex;
-      align-items: flex-start;
-      gap: 7px;
-      padding: 3px 0;
+      flex-direction: column;
+      gap: 2px;
+      padding: 8px 10px;
+      border: 1.5px solid #E2E8F0;
+      border-radius: 6px;
       cursor: pointer;
+      background: #fff;
+      transition: border-color 0.15s, background 0.15s;
+      user-select: none;
+      position: relative;
     }
 
-    .plating-item:hover {
-      background: #F9FAFB;
-      border-radius: 3px;
+    .plate-card .plate-cb {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+      pointer-events: none;
     }
 
-    .plate-cb {
-      width: 14px;
-      height: 14px;
-      flex-shrink: 0;
-      margin-top: 1px;
-      accent-color: var(--accept);
-    }
-
-    .plate-label {
+    .plate-card-abbr {
+      font-family: var(--mono);
       font-size: 12px;
+      font-weight: 700;
+      color: var(--sys-dark);
+      line-height: 1.2;
+    }
+
+    .plate-card-name {
+      font-size: 10px;
+      color: var(--text-muted);
       line-height: 1.3;
     }
 
-    .plate-label .plate-abbr {
+    .plate-card:hover {
+      border-color: var(--accept-border);
+      background: var(--accept-light);
+    }
+
+    .plate-card:has(input:checked) {
+      border-color: var(--accept);
+      background: var(--accept-light);
+    }
+
+    .plate-card:has(input:checked) .plate-card-abbr {
+      color: var(--accept);
+    }
+
+    .plate-card:has(input:checked)::after {
+      content: '✓';
+      position: absolute;
+      top: 5px;
+      right: 7px;
+      font-size: 10px;
       font-weight: 700;
-      color: var(--sys-dark);
+      color: var(--accept);
+    }
+
+    .plate-card:has(input:disabled) {
+      pointer-events: none;
+      opacity: 0.78;
+    }
+
+    .plating-submit-bar {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--form-line);
     }
 
     .btn-submit-plating {
-      width: 100%;
-      padding: 11px;
+      padding: 10px 28px;
       background: var(--accept);
       color: #fff;
       border: none;
@@ -990,7 +1133,6 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
       letter-spacing: 0.3px;
       transition: background 0.2s;
     }
@@ -1000,8 +1142,7 @@
     }
 
     .btn-confirm-skip {
-      width: 100%;
-      padding: 11px;
+      padding: 10px 28px;
       background: var(--sys-dark);
       color: #fff;
       border: none;
@@ -1009,7 +1150,6 @@
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 12px;
       transition: background 0.2s;
     }
 
@@ -2163,7 +2303,7 @@
         </div>
       </div>
 
-      <!-- RIGHT: Label + Specimen + Decision -->
+      <!-- RIGHT: Label + Specimen -->
       <div class="case-right-col">
         <div class="panel">
           <div class="panel-header">Specimen Label</div>
@@ -2174,85 +2314,156 @@
           <div class="panel-header">Physical Specimen Observations</div>
           <div class="specimen-details" id="specimen-details"><!-- rendered by JS --></div>
         </div>
+      </div>
 
+      <!-- FULL-WIDTH: Accessioning Decision + Plating -->
+      <div class="case-decision-row">
         <div class="panel">
           <div class="panel-header" id="decision-panel-header">Accessioning Decision</div>
           <div class="decision-panel">
             <div id="review-banner" class="alert-banner alert-info hidden" style="margin-bottom:12px"></div>
+
             <!-- Step 1: Accept / Reject -->
             <div id="decision-step">
-              <div class="decision-question">Is this specimen acceptable for processing?</div>
-              <div class="decision-btns">
-                <button class="btn-accept" id="btn-accept" onclick="selectDecision('ACCEPT')">✓ ACCEPT</button>
-                <button class="btn-reject" id="btn-reject" onclick="selectDecision('REJECT')">✗ REJECT</button>
+              <div class="decision-bar">
+                <div class="decision-question">Is this specimen acceptable for processing?</div>
+                <div class="decision-btns">
+                  <button class="btn-accept" id="btn-accept" onclick="selectDecision('ACCEPT')">✓ ACCEPT</button>
+                  <button class="btn-reject" id="btn-reject" onclick="selectDecision('REJECT')">✗ REJECT</button>
+                </div>
               </div>
 
               <div class="reasons-section" id="reasons-section">
                 <div class="reasons-label">Reason(s) for Rejection — select all that apply:</div>
+                <div class="reasons-grid">
 
-                <div class="reasons-category">
-                  <div class="reasons-cat-title">Label Issues</div>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_name"> <span
-                      class="reason-text">Missing patient name on specimen label</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_identifier"> <span
-                      class="reason-text">Missing unique identifier (PHN or DOB) on specimen label</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_date"> <span
-                      class="reason-text">Missing collection date on specimen label</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_no_time"> <span
-                      class="reason-text">Missing collection time on specimen label</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_name_mismatch"> <span
-                      class="reason-text">Patient name does not match between label and requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="label_phn_mismatch"> <span
-                      class="reason-text">PHN does not match between label and requisition</span></label>
-                </div>
+                  <div class="reason-cat-col">
+                    <div class="reasons-cat-header cat-label-hd">Label Issues</div>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_no_name">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing patient name on specimen label</span>
+                    </label>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_no_identifier">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing unique identifier (PHN or DOB) on specimen label</span>
+                    </label>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_no_date">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing collection date on specimen label</span>
+                    </label>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_no_time">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing collection time on specimen label</span>
+                    </label>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_name_mismatch">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Patient name does not match between label and requisition</span>
+                    </label>
+                    <label class="reason-chip cat-label">
+                      <input type="checkbox" class="reason-cb" value="label_phn_mismatch">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">PHN does not match between label and requisition</span>
+                    </label>
+                  </div>
 
-                <div class="reasons-category">
-                  <div class="reasons-cat-title">Requisition Issues</div>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_name"> <span
-                      class="reason-text">Missing patient name on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_dob"> <span
-                      class="reason-text">Missing date of birth on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_phn"> <span
-                      class="reason-text">Missing PHN on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_tests"> <span
-                      class="reason-text">Tests requested not specified on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_source"> <span
-                      class="reason-text">Source of specimen not specified on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_date"> <span
-                      class="reason-text">Missing collection date on requisition</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="req_no_provider"> <span
-                      class="reason-text">Missing ordering provider name on requisition</span></label>
-                </div>
+                  <div class="reason-cat-col">
+                    <div class="reasons-cat-header cat-req-hd">Requisition Issues</div>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_name">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing patient name on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_dob">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing date of birth on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_phn">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing PHN on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_tests">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Tests requested not specified on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_source">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Source of specimen not specified on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_date">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing collection date on requisition</span>
+                    </label>
+                    <label class="reason-chip cat-req">
+                      <input type="checkbox" class="reason-cb" value="req_no_provider">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Missing ordering provider name on requisition</span>
+                    </label>
+                  </div>
 
-                <div class="reasons-category">
-                  <div class="reasons-cat-title">Specimen Suitability</div>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_wrong_container">
-                    <span class="reason-text">Incorrect specimen collection container</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_insufficient">
-                    <span class="reason-text">Insufficient specimen quantity</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_transport_error">
-                    <span class="reason-text">Incorrect transport conditions (temperature/timing)</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb"
-                      value="specimen_inadequate_fixative"> <span class="reason-text">Inadequate fixative</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_too_large"> <span
-                      class="reason-text">Specimen too large for container</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_stability_age">
-                    <span class="reason-text">Specimen stability compromised (age)</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_stability_temp">
-                    <span class="reason-text">Specimen stability compromised (temperature)</span></label>
-                  <label class="reason-item"><input type="checkbox" class="reason-cb" value="specimen_leaking"> <span
-                      class="reason-text">Leaking specimen</span></label>
+                  <div class="reason-cat-col">
+                    <div class="reasons-cat-header cat-specimen-hd">Specimen Suitability</div>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_wrong_container">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Incorrect specimen collection container</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_insufficient">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Insufficient specimen quantity</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_transport_error">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Incorrect transport conditions (temperature/timing)</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_inadequate_fixative">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Inadequate fixative</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_too_large">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Specimen too large for container</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_stability_age">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Specimen stability compromised (age)</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_stability_temp">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Specimen stability compromised (temperature)</span>
+                    </label>
+                    <label class="reason-chip cat-specimen">
+                      <input type="checkbox" class="reason-cb" value="specimen_leaking">
+                      <span class="chip-check"></span>
+                      <span class="chip-text">Leaking specimen</span>
+                    </label>
+                  </div>
+
                 </div>
               </div>
 
-              <button class="btn-submit-case" id="btn-submit" onclick="submitCase()" disabled>Submit Decision</button>
+              <div class="decision-submit-bar">
+                <button class="btn-submit-case" id="btn-submit" onclick="submitCase()" disabled>Submit Decision</button>
+              </div>
             </div>
 
             <!-- Step 2: Plating selection (shown after ACCEPT) -->
-            <div id="plating-step" style="display:none">
-              <div class="plating-step-header">✓ Specimen Accepted — now select appropriate media for plating:</div>
-              <div id="plating-grid"><!-- rendered by JS --></div>
-            </div>
+            <div id="plating-step" style="display:none"></div>
           </div>
         </div>
       </div>
@@ -3419,7 +3630,7 @@
       </div>
     </details>
 
-    <details class="manual-section" open data-search="plating media agar broth gram stain urine blood culture wound sputum stool throat nasopharyngeal swab csf tissue">
+    <details class="manual-section" open data-search="plating media agar broth gram stain">
       <summary>Plating Reference</summary>
       <div class="manual-section-body manual-entry-stack">
         ${platingEntries}
@@ -3507,20 +3718,29 @@
       }
 
       const selected = result.platingResult?.selected || [];
-      const groupsHTML = MEDIA_GROUPS.map(g => `
-    <div class="plating-group">
-      <div class="plating-group-title">${g.name}</div>
-      ${g.items.map(m => `
-        <label class="plating-item">
-          <input type="checkbox" class="plate-cb" value="${m.val}" disabled ${selected.includes(m.val) ? 'checked' : ''}>
-          <span class="plate-label">${m.label}</span>
-        </label>`).join('')}
-    </div>`).join('');
+      const groupsHTML = MEDIA_GROUPS.map(g => {
+        const cardsHTML = g.items.map(m => {
+          const abbrMatch = m.label.match(/plate-abbr">([^<]+)<\/span>/);
+          const abbr = abbrMatch ? abbrMatch[1] : m.val;
+          const nameMatch = m.label.match(/— (.+)$/);
+          const name = nameMatch ? nameMatch[1] : '';
+          const isChecked = selected.includes(m.val);
+          return `<label class="plate-card">
+            <input type="checkbox" class="plate-cb" value="${m.val}" disabled ${isChecked ? 'checked' : ''}>
+            <span class="plate-card-abbr">${abbr}</span>
+            <span class="plate-card-name">${name}</span>
+          </label>`;
+        }).join('');
+        return `<div class="plating-group">
+          <div class="plating-group-title">${g.name}</div>
+          <div class="plate-cards">${cardsHTML}</div>
+        </div>`;
+      }).join('');
 
       return `
     <div class="plating-step-header">Recorded plating selection for this ${c.spec.type}:</div>
     ${plating.notes ? `<div class="plating-note">Note: ${plating.notes}</div>` : ''}
-    ${groupsHTML}
+    <div class="plating-groups-wrap">${groupsHTML}</div>
     <div class="plating-note" style="margin-top:12px">Read-only review — checked media reflect what you submitted.</div>`;
     }
 
@@ -3622,25 +3842,37 @@
       if (plating.skip) {
         step.innerHTML = `
       <div class="plating-skip-msg">ℹ️ <strong>${c.spec.type}:</strong> ${plating.message}</div>
-      <button class="btn-confirm-skip" onclick="submitPlating(true)">Confirm &amp; Continue →</button>`;
+      <div class="plating-submit-bar">
+        <button class="btn-confirm-skip" onclick="submitPlating(true)">Confirm &amp; Continue →</button>
+      </div>`;
         return;
       }
 
-      const groupsHTML = MEDIA_GROUPS.map(g => `
-    <div class="plating-group">
-      <div class="plating-group-title">${g.name}</div>
-      ${g.items.map(m => `
-        <label class="plating-item">
-          <input type="checkbox" class="plate-cb" value="${m.val}">
-          <span class="plate-label">${m.label}</span>
-        </label>`).join('')}
-    </div>`).join('');
+      const groupsHTML = MEDIA_GROUPS.map(g => {
+        const cardsHTML = g.items.map(m => {
+          const abbrMatch = m.label.match(/plate-abbr">([^<]+)<\/span>/);
+          const abbr = abbrMatch ? abbrMatch[1] : m.val;
+          const nameMatch = m.label.match(/— (.+)$/);
+          const name = nameMatch ? nameMatch[1] : '';
+          return `<label class="plate-card">
+            <input type="checkbox" class="plate-cb" value="${m.val}">
+            <span class="plate-card-abbr">${abbr}</span>
+            <span class="plate-card-name">${name}</span>
+          </label>`;
+        }).join('');
+        return `<div class="plating-group">
+          <div class="plating-group-title">${g.name}</div>
+          <div class="plate-cards">${cardsHTML}</div>
+        </div>`;
+      }).join('');
 
       step.innerHTML = `
     <div class="plating-step-header">✓ Specimen Accepted — select all appropriate media for this ${c.spec.type}:</div>
     ${plating.notes ? `<div class="plating-note">Note: ${plating.notes}</div>` : ''}
-    ${groupsHTML}
-    <button class="btn-submit-plating" onclick="submitPlating(false)">Submit Plating Selection</button>`;
+    <div class="plating-groups-wrap">${groupsHTML}</div>
+    <div class="plating-submit-bar">
+      <button class="btn-submit-plating" onclick="submitPlating(false)">Submit Plating Selection</button>
+    </div>`;
     }
 
     function submitPlating(skipped) {

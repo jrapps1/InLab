@@ -2937,15 +2937,15 @@
 
     /* ── CASE GENERATION ─────────────────────────────────────────────────── */
     /* Distribution strategy for N cases:
-       ~30% acceptable, ~20% label-only errors, ~20% req-only errors,
-       ~15% specimen suitability, ~15% mixed errors */
+       ~50% acceptable, ~15% label-only errors, ~15% req-only errors,
+       ~10% specimen suitability, ~10% mixed errors */
     function generateCases(n) {
       const cases = [];
       const categories = [];
-      const ok   = Math.round(n * 0.30);
-      const lbl  = Math.round(n * 0.20);
-      const req  = Math.round(n * 0.20);
-      const spec = Math.round(n * 0.15);
+      const ok   = Math.round(n * 0.50);
+      const lbl  = Math.round(n * 0.15);
+      const req  = Math.round(n * 0.15);
+      const spec = Math.round(n * 0.10);
       const mix  = n - ok - lbl - req - spec;
       categories.push(...Array(ok).fill('ok'));
       categories.push(...Array(lbl).fill('label'));
@@ -2970,7 +2970,7 @@
       const physician = rand(PHYSICIANS);
       const source = rand(spec.sources);
       const test = rand(spec.tests);
-      const hoursAgo = randInt(0, 3);
+      const hoursAgo = randInt(0, Math.min(3, Math.max(0, spec.maxHours - 1)));
       const collected = genDate(hoursAgo);
       const reqNum = `REQ-${String(randInt(10000, 99999))}`;
 
